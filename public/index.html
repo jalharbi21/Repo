@@ -38,6 +38,7 @@
   --good: #4cc27f; --warn: #e0a25a; --map-bg: #1f2622; color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
@@ -113,12 +114,6 @@ details { border-top: 1px dashed var(--line); padding-top: 8px; }
 summary { cursor: pointer; font: 600 13px var(--body); color: var(--muted); }
 ol.steps { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
 ol.steps .d { color: var(--muted); font: 400 12px var(--mono); margin-left: 6px; }
-.start {
-  display: inline-flex; justify-content: center; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 8px;
-  font: 800 14px var(--display); text-decoration: none; color: #fff;
-}
-.card[data-p="google"] .start { background: var(--google); }
-.card[data-p="apple"] .start { background: var(--apple); }
 .err { color: var(--warn); font-size: 14px; margin: 0; overflow-wrap: anywhere; }
 
 .mapbox { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); min-width: 0; }
@@ -136,12 +131,66 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
 .dlg .ghost { height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 600 14px var(--body); cursor: pointer; }
 .dlg a { color: var(--sign); }
 
+/* ---- navigation mode */
+.navbtn {
+  display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 11px 14px; border-radius: 8px; border: 0;
+  font: 800 15px var(--display); color: #fff; cursor: pointer; letter-spacing: .02em;
+}
+.card[data-p="google"] .navbtn { background: var(--google); }
+.card[data-p="apple"] .navbtn { background: var(--apple); }
+.verdict .navbtn { background: var(--sign-ink); color: var(--sign); }
+.info { margin: 0; font-size: 13px; color: var(--warn); }
+.nav-only { display: none; }
+body.navigating .browse-only { display: none !important; }
+body.navigating .nav-only { display: grid; }
+body.navigating .main { grid-template-columns: minmax(0, 1fr); }
+body.navigating .mapbox { position: static; }
+body.navigating #map { height: calc(100vh - 290px); min-height: 260px; }
+.turn {
+  grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center;
+  background: var(--sign); color: var(--sign-ink); border-radius: 12px; padding: 14px 16px;
+}
+.turn svg { width: 64px; height: 64px; }
+.turn .dist { font: 800 30px/1 var(--display); font-variant-numeric: tabular-nums; }
+.turn .instr { font: 600 19px/1.25 var(--display); overflow-wrap: anywhere; }
+.turn .then { display: flex; gap: 8px; align-items: center; font-size: 13px; opacity: .9; margin-top: 6px; }
+.turn .then svg { width: 18px; height: 18px; }
+.turn.off { background: var(--warn); }
+.tripbar {
+  grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; align-items: center;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+}
+.tripbar .big { font: 800 26px/1 var(--display); font-variant-numeric: tabular-nums; }
+.tripbar .meta { color: var(--muted); font: 400 13px var(--mono); font-variant-numeric: tabular-nums; }
+.tripbar .street { font: 600 14px var(--body); overflow-wrap: anywhere; }
+.navctl { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.navctl button {
+  height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  font: 600 13px var(--body); cursor: pointer;
+}
+.navctl button.end { background: var(--warn); color: #fff; border-color: transparent; }
+.navctl button[aria-pressed="true"] { background: var(--sign); color: var(--sign-ink); border-color: transparent; }
+.steplist { grid-column: 1 / -1; margin: 0; padding-left: 22px; max-height: 30vh; overflow: auto; display: grid; gap: 4px; font-size: 14px; }
+.steplist li.now { font-weight: 800; color: var(--sign); }
+.steplist li.done { color: var(--muted); text-decoration: line-through; }
+.me { width: 30px; height: 30px; }
+.me svg { width: 30px; height: 30px; transition: transform .4s; filter: drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
+.recenter { position: absolute; right: 12px; bottom: 30px; z-index: 500; }
+.mapbox { position: sticky; }
+body.navigating .mapbox { position: relative; }
+
 @media (max-width: 900px) {
   .main { grid-template-columns: minmax(0, 1fr); }
   .mapbox { position: static; order: -1; }
   #map { height: 46vh; }
 }
 @media (max-width: 640px) {
+  .tripbar { grid-template-columns: minmax(0, 1fr); }
+  .navctl { justify-content: flex-start; }
+  .turn svg { width: 48px; height: 48px; }
+  .turn .dist { font-size: 26px; }
+  .turn .instr { font-size: 17px; }
+  body.navigating #map { height: calc(100vh - 380px); }
   form.trip { grid-template-columns: minmax(0, 1fr) auto; }
   form.trip label:nth-of-type(2) { grid-column: 1 / 2; }
   .swap { grid-column: 2; grid-row: 1; align-self: end; }
@@ -153,7 +202,7 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
 </style>
 
 <div class="wrap">
-  <header class="bar">
+  <header class="bar browse-only">
     <div class="brand">
       <span class="shield" aria-hidden="true">G·A</span>
       <div>
@@ -168,7 +217,7 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
     </div>
   </header>
 
-  <form class="trip" id="trip" autocomplete="on">
+  <form class="trip browse-only" id="trip" autocomplete="on">
     <label for="origin">From
       <input type="text" id="origin" name="origin" placeholder="Address, place, or lat,lng" required>
     </label>
@@ -184,22 +233,48 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
     <button class="go" type="submit" id="go">Compare routes</button>
   </form>
 
-  <section class="verdict" id="verdict" aria-live="polite">
+  <section class="verdict browse-only" id="verdict" aria-live="polite">
     <div><strong id="v-title">Loading sample trip…</strong><br><span id="v-sub"></span></div>
-    <span class="tag" id="v-tag">Sample data</span>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="tag" id="v-tag">Sample data</span><button type="button" class="navbtn" id="nav-best">Start navigation</button></div>
+  </section>
+
+  <section class="turn nav-only" id="turn" aria-live="polite">
+    <div id="turn-icon"></div>
+    <div>
+      <div class="dist" id="turn-dist">–</div>
+      <div class="instr" id="turn-instr">Starting navigation…</div>
+      <div class="then" id="turn-then"></div>
+    </div>
   </section>
 
   <div class="main">
-    <div class="providers">
+    <div class="providers browse-only">
       <article class="card" data-p="google" id="card-google"></article>
       <article class="card" data-p="apple" id="card-apple"></article>
     </div>
     <div class="mapbox">
       <div id="map" role="img" aria-label="Map showing the Google and Apple routes"></div>
-      <div class="legend"><span><i style="background:var(--google)"></i>Google Maps</span><span><i style="background:var(--apple)"></i>Apple Maps</span><span>Thin lines are alternatives</span></div>
+      <button type="button" class="recenter navctl nav-only" id="recenter" hidden><span style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:600 13px var(--body);color:var(--ink)">Re-center</span></button>
+      <div class="legend browse-only"><span><i style="background:var(--google)"></i>Google Maps</span><span><i style="background:var(--apple)"></i>Apple Maps</span><span>Thin lines are alternatives</span></div>
     </div>
   </div>
 </div>
+
+<section class="tripbar nav-only wrap" id="tripbar" style="margin-top:12px">
+  <div>
+    <div><span class="big" id="nav-left">–</span> <span class="meta" id="nav-meta"></span></div>
+    <div class="street" id="nav-street"></div>
+    <div class="meta" id="nav-source"></div>
+  </div>
+  <div class="navctl">
+    <button type="button" id="nav-steps" aria-pressed="false">Steps</button>
+    <button type="button" id="nav-voice" aria-pressed="true">Voice on</button>
+    <button type="button" id="nav-pos">Use GPS</button>
+    <button type="button" id="nav-speed" hidden>Speed 4×</button>
+    <button type="button" class="end" id="nav-end">End</button>
+  </div>
+  <ol class="steplist" id="nav-steplist" hidden></ol>
+</section>
 
 <dialog id="keys">
   <form class="dlg" method="dialog" id="keys-form">
@@ -222,7 +297,8 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script type="module">
-import { fetchGoogleRoutes, fetchAppleRoutes, demoRoutes, handoffLinks } from "./providers.js";
+import { fetchGoogleRoutes, fetchAppleRoutes, demoRoutes } from "./providers.js";
+import { createTracker, pointAt } from "./nav.js";
 
 const $ = (s) => document.querySelector(s);
 const state = { mode: "drive", server: null, result: null, selected: { google: 0, apple: 0 } };
@@ -288,7 +364,6 @@ function renderCard(p) {
   const el = $(`#card-${p}`);
   const name = p === "google" ? "Google Maps" : "Apple Maps";
   const r = state.result?.[p];
-  const links = handoffLinks(state.result?.origin || $("#origin").value, state.result?.destination || $("#destination").value, state.mode);
   const fastest = fastestProvider();
   let body;
   if (!r) {
@@ -304,13 +379,15 @@ function renderCard(p) {
         <button type="button" class="alt" data-p="${p}" data-i="${i}" aria-pressed="${i === state.selected[p]}">
           <span class="nm">${esc(rt.name)}</span><span class="n">${fmtDur(rt.durationSec)} · ${fmtDist(rt.distanceM)}</span>
         </button>`).join("")}</div>
+      ${route.trafficDelaySec >= 60 ? `<p class="info">Includes ${fmtDur(route.trafficDelaySec)} of traffic delay</p>` : ""}
+      ${(route.warnings || []).map((w) => `<p class="info">${esc(w)}</p>`).join("")}
       ${route.steps.length ? `<details><summary>${route.steps.length} turn-by-turn steps</summary>
         <ol class="steps">${route.steps.map((s) => `<li>${esc(s.instruction)}<span class="d">${fmtDist(s.distanceM)}</span></li>`).join("")}</ol></details>` : ""}`;
   }
   el.innerHTML = `
     <div class="card-head"><h2><span class="swatch"></span>${name}</h2>${fastest === p ? `<span class="badge">FASTEST</span>` : ""}</div>
     <div class="card-body">${body}
-      <a class="start" href="${esc(links[p])}" target="_blank" rel="noopener">Start in ${name} ↗</a>
+      ${r?.ok ? `<button type="button" class="navbtn" data-nav="${p}">Navigate with ${name} route</button>` : ""}
     </div>`;
 }
 function fastestProvider() {
@@ -325,6 +402,7 @@ function renderVerdict() {
   const g = state.result?.google, a = state.result?.apple;
   const title = $("#v-title"), sub = $("#v-sub"), tag = $("#v-tag");
   tag.textContent = state.result?.demo ? "Sample data" : "Live";
+  $("#nav-best").hidden = !(g?.ok || a?.ok);
   if (!g?.ok && !a?.ok) {
     title.textContent = "No routes yet";
     sub.textContent = "Neither service answered. Check the messages below each card.";
@@ -457,6 +535,266 @@ $("#k-clear").addEventListener("click", () => {
   refreshStatus();
 });
 $("#k-demo").addEventListener("click", () => { $("#keys").close(); showDemo(); });
+
+// ---- turn-by-turn navigation (runs entirely in this page; Google and Apple only supply the route data)
+const ICONS = {
+  straight: ["M12 20V5", "M6 11l6-6 6 6"],
+  depart: ["M12 20V5", "M6 11l6-6 6 6"],
+  left: ["M17 20v-7a3 3 0 0 0-3-3H6", "M10 6l-4 4 4 4"],
+  right: ["M7 20v-7a3 3 0 0 1 3-3h8", "M14 6l4 4-4 4"],
+  "slight-left": ["M15 20v-6L8 7", "M8 13V7h6"],
+  "slight-right": ["M9 20v-6l7-7", "M10 7h6v6"],
+  "sharp-left": ["M16 4v8L7 18", "M7 12v6h6"],
+  "sharp-right": ["M8 4v8l9 6", "M17 12v6h-6"],
+  uturn: ["M16 20V9a4 4 0 0 0-8 0v5", "M5 11l3 3 3-3"],
+  roundabout: ["M12 21v-7", "M16 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0", "M16 10h4", "M18 8l2 2-2 2"],
+  merge: ["M8 20v-5l4-4V4", "M16 20v-5l-4-4", "M8 8l4-4 4 4"],
+  arrive: ["M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z", "M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0"],
+  ferry: ["M3 18c2 1.5 4 1.5 6 0s4-1.5 6 0 4 1.5 6 0", "M5 15l1-5h12l1 5", "M9 10V6h6v4"],
+};
+const icon = (m) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(ICONS[m] || ICONS.straight).map((d) => `<path d="${d}"/>`).join("")}</svg>`;
+const ARROW = `<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="#ffffff"/><circle cx="15" cy="15" r="10" fill="var(--sign)"/><path d="M15 7l6 13-6-3.5-6 3.5z" fill="#ffffff"/></svg>`;
+
+const navState = {
+  on: false, provider: null, route: null, tracker: null, destination: "", source: "sim",
+  simAlong: 0, simTimer: null, watchId: null, speed: 4, voice: store.get("nav.voice") !== "off",
+  follow: true, rerouting: false, layers: null, me: null, lastFix: null, wakeLock: null,
+};
+
+function speak(lines) {
+  if (!navState.voice || !lines.length || !("speechSynthesis" in window)) return;
+  try {
+    speechSynthesis.cancel();
+    for (const t of lines) speechSynthesis.speak(new SpeechSynthesisUtterance(t));
+  } catch {}
+}
+
+function startNavigation(provider) {
+  const r = state.result?.[provider];
+  if (!r?.ok) return;
+  const route = r.routes[state.selected[provider]] || r.routes[0];
+  if (!route.path.length || !route.steps.length) return;
+  Object.assign(navState, {
+    on: true, provider, route, destination: state.result.destination, follow: true, rerouting: false, lastFix: null, lastAlong: 0,
+  });
+  navState.tracker = createTracker(route);
+  document.body.classList.add("navigating");
+  if (map) {
+    map.invalidateSize();
+    layers.clearLayers();
+    navState.layers = L.layerGroup().addTo(map);
+    map.on("dragstart", onDrag);
+  }
+  try { navigator.wakeLock?.request("screen").then((w) => (navState.wakeLock = w)).catch(() => {}); } catch {}
+  renderStepList();
+  setVoiceBtn();
+  // Live GPS when the page is allowed to use it; otherwise a simulated drive along the route.
+  useSource(state.result.demo ? "sim" : "gps");
+  window.scrollTo(0, 0);
+}
+
+function onDrag() {
+  navState.follow = false;
+  $("#recenter").hidden = false;
+}
+$("#recenter").addEventListener("click", () => {
+  navState.follow = true;
+  $("#recenter").hidden = true;
+  if (navState.lastFix) map.setView(navState.lastFix, 17);
+});
+
+function stopPosition() {
+  clearInterval(navState.simTimer);
+  navState.simTimer = null;
+  if (navState.watchId != null) navigator.geolocation?.clearWatch(navState.watchId);
+  navState.watchId = null;
+}
+
+function useSource(source) {
+  stopPosition();
+  navState.source = source;
+  $("#nav-pos").textContent = source === "gps" ? "Simulate drive" : "Use GPS";
+  $("#nav-speed").hidden = source !== "sim";
+  if (source === "gps") {
+    if (!navigator.geolocation) return gpsFailed("This browser has no location access.");
+    $("#turn-instr").textContent = "Finding your location…";
+    navState.watchId = navigator.geolocation.watchPosition(
+      (p) => onFix([p.coords.latitude, p.coords.longitude], p.coords.heading),
+      (e) => gpsFailed(e.code === 1 ? "Location permission was refused." : "Couldn't get your location."),
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 }
+    );
+  } else {
+    const nav = navState.tracker.nav;
+    const mps = nav.total / Math.max(60, nav.durationSec);
+    navState.simAlong = navState.lastAlong || 0; // carry on from where we are
+    const tick = () => {
+      navState.simAlong = Math.min(nav.total, navState.simAlong + mps * navState.speed * 0.5);
+      const pt = pointAt(nav, navState.simAlong);
+      onFix(pt.point, pt.heading);
+      if (navState.simAlong >= nav.total) clearInterval(navState.simTimer);
+    };
+    tick();
+    navState.simTimer = setInterval(tick, 500);
+  }
+}
+
+function gpsFailed(why) {
+  $("#nav-source").textContent = `${why} Showing a simulated drive instead.`;
+  useSource("sim");
+}
+
+function onFix(pos, heading) {
+  if (!navState.on) return;
+  const u = navState.tracker.update(pos);
+  navState.lastAlong = navState.tracker.nav.total - u.remainingM;
+  const prev = navState.lastFix;
+  navState.lastFix = pos;
+  const hdg = Number.isFinite(heading) ? heading : prev ? bearing(prev, pos) : 0;
+  drawNav(u, pos, hdg);
+  renderNav(u);
+  speak(u.announce);
+  if (u.needsReroute && !navState.rerouting && navState.source === "gps") reroute(pos);
+  if (u.arrived) stopPosition();
+}
+
+function bearing(a, b) {
+  const toR = Math.PI / 180;
+  const y = Math.sin((b[1] - a[1]) * toR) * Math.cos(b[0] * toR);
+  const x = Math.cos(a[0] * toR) * Math.sin(b[0] * toR) - Math.sin(a[0] * toR) * Math.cos(b[0] * toR) * Math.cos((b[1] - a[1]) * toR);
+  return (Math.atan2(y, x) / toR + 360) % 360;
+}
+
+function drawNav(u, pos, hdg) {
+  if (!map) return;
+  const nav = navState.tracker.nav;
+  const color = cssVar(navState.provider === "google" ? "--google" : "--apple");
+  const g = navState.layers;
+  g.clearLayers();
+  const along = nav.total - u.remainingM;
+  const split = pointAt(nav, along);
+  const done = nav.path.slice(0, split.segIdx + 1).concat([split.point]);
+  const ahead = [split.point].concat(nav.path.slice(split.segIdx + 1));
+  L.polyline(done, { color: cssVar("--muted"), weight: 6, opacity: 0.6 }).addTo(g);
+  L.polyline(ahead, { color, weight: 8, opacity: 0.9 }).addTo(g);
+  L.circleMarker(nav.path.at(-1), { radius: 8, color: cssVar("--ink"), fillColor: cssVar("--ink"), fillOpacity: 1 }).bindTooltip("Destination").addTo(g);
+  const me = L.marker(u.offBy > 45 ? pos : u.snapped, {
+    icon: L.divIcon({ className: "me", html: ARROW.replace("<svg", `<svg style="transform:rotate(${Math.round(hdg)}deg)"`), iconSize: [30, 30], iconAnchor: [15, 15] }),
+    interactive: false,
+  });
+  me.addTo(g);
+  if (navState.follow) map.setView(u.offBy > 45 ? pos : u.snapped, Math.max(map.getZoom(), 16), { animate: true });
+}
+
+function renderNav(u) {
+  const turn = $("#turn");
+  const off = u.offBy > 45 && !u.arrived;
+  turn.classList.toggle("off", off);
+  if (u.arrived) {
+    $("#turn-icon").innerHTML = icon("arrive");
+    $("#turn-dist").textContent = "Arrived";
+    $("#turn-instr").textContent = navState.destination;
+    $("#turn-then").innerHTML = "";
+  } else if (off) {
+    $("#turn-icon").innerHTML = icon("uturn");
+    $("#turn-dist").textContent = `${fmtDist(u.offBy)} off route`;
+    $("#turn-instr").textContent = navState.rerouting ? `Getting a new route from ${provName()}…` : "Head back to the highlighted line";
+    $("#turn-then").innerHTML = "";
+  } else {
+    $("#turn-icon").innerHTML = icon(u.next ? u.next.maneuver : "arrive");
+    $("#turn-dist").textContent = fmtDist(roundDist(u.toNextM));
+    $("#turn-instr").textContent = u.next ? u.next.instruction : `Arrive at ${navState.destination}`;
+    const after = navState.tracker.nav.steps[u.stepIdx + 2];
+    $("#turn-then").innerHTML = after ? `Then ${icon(after.maneuver)} <span>${esc(after.instruction)}</span>` : u.next ? "Then you arrive" : "";
+  }
+  $("#nav-left").textContent = fmtDur(u.remainingSec);
+  $("#nav-meta").textContent = `${fmtDist(u.remainingM)} · arrive ${arrive(u.remainingSec)}`;
+  const street = u.current?.street;
+  $("#nav-street").textContent = street ? `On ${street}` : "";
+  if (!$("#nav-source").textContent.includes("simulated")) {
+    $("#nav-source").textContent = `Route and street data: ${provName()} · ${navState.source === "gps" ? "live GPS" : `simulated drive at ${navState.speed}×`}`;
+  }
+  document.querySelectorAll("#nav-steplist li").forEach((li, i) => {
+    li.className = i < u.stepIdx ? "done" : i === u.stepIdx ? "now" : "";
+  });
+}
+const roundDist = (m) => (m >= 1000 ? m : m >= 100 ? Math.round(m / 50) * 50 : Math.round(m / 10) * 10);
+const provName = () => (navState.provider === "google" ? "Google Maps" : "Apple Maps");
+
+function renderStepList() {
+  $("#nav-steplist").innerHTML = navState.tracker.nav.steps
+    .map((st) => `<li>${esc(st.instruction)} <span class="meta">${fmtDist(st.distanceM)}</span></li>`)
+    .join("");
+}
+
+async function reroute(pos) {
+  navState.rerouting = true;
+  try {
+    const res = await lookUp(`${pos[0].toFixed(6)},${pos[1].toFixed(6)}`, navState.destination);
+    const order = navState.provider === "google" ? ["google", "apple"] : ["apple", "google"];
+    const p = order.find((k) => res[k]?.ok && res[k].routes[0]?.steps.length);
+    if (p && navState.on) {
+      navState.provider = p;
+      navState.route = res[p].routes[0];
+      navState.tracker = createTracker(navState.route);
+      navState.lastAlong = 0;
+      renderStepList();
+      speak(["Route updated"]);
+    }
+  } catch {}
+  setTimeout(() => (navState.rerouting = false), 8000); // don't ask again for a few seconds
+}
+
+function endNavigation() {
+  stopPosition();
+  navState.on = false;
+  try { speechSynthesis.cancel(); } catch {}
+  try { navState.wakeLock?.release(); } catch {}
+  document.body.classList.remove("navigating");
+  $("#nav-source").textContent = "";
+  $("#recenter").hidden = true;
+  if (map) {
+    map.off("dragstart", onDrag);
+    navState.layers?.remove();
+    map.invalidateSize();
+  }
+  render();
+}
+
+function setVoiceBtn() {
+  const b = $("#nav-voice");
+  b.setAttribute("aria-pressed", String(navState.voice));
+  b.textContent = navState.voice ? "Voice on" : "Voice off";
+}
+$("#nav-voice").addEventListener("click", () => {
+  navState.voice = !navState.voice;
+  store.set("nav.voice", navState.voice ? "" : "off");
+  if (!navState.voice) try { speechSynthesis.cancel(); } catch {}
+  setVoiceBtn();
+});
+$("#nav-pos").addEventListener("click", () => {
+  $("#nav-source").textContent = "";
+  useSource(navState.source === "gps" ? "sim" : "gps");
+});
+$("#nav-speed").addEventListener("click", () => {
+  const speeds = [1, 4, 10];
+  navState.speed = speeds[(speeds.indexOf(navState.speed) + 1) % speeds.length];
+  $("#nav-speed").textContent = `Speed ${navState.speed}×`;
+  $("#nav-source").textContent = "";
+});
+$("#nav-steps").addEventListener("click", () => {
+  const list = $("#nav-steplist");
+  list.hidden = !list.hidden;
+  $("#nav-steps").setAttribute("aria-pressed", String(!list.hidden));
+});
+$("#nav-end").addEventListener("click", endNavigation);
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-nav]");
+  if (b) startNavigation(b.dataset.nav);
+});
+$("#nav-best").addEventListener("click", () => {
+  const p = fastestProvider() || (state.result?.google?.ok ? "google" : "apple");
+  startNavigation(p);
+});
 
 // ---- boot
 async function boot() {
