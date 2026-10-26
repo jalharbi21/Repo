@@ -1,0 +1,472 @@
+<title>Two-Map Navigator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&family=Overpass+Mono:wght@400;600&display=swap">
+<style>
+/* Leaflet 1.9.4 stylesheet (BSD-2-Clause), inlined */
+.leaflet-image-layer,.leaflet-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane,.leaflet-pane>canvas,.leaflet-pane>svg,.leaflet-tile,.leaflet-tile-container,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile::selection{background:0 0}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer{max-width:none!important;max-height:none!important;width:auto;padding:0}.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}.leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom;touch-action:none;touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{-ms-touch-action:none;touch-action:none}.leaflet-container{-webkit-tap-highlight-color:transparent}.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{-webkit-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}svg.leaflet-zoom-animated{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab;cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing;cursor:grabbing}.leaflet-image-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-image-layer.leaflet-interactive,.leaflet-marker-icon.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline-offset:1px}.leaflet-container a{color:#0078a8}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;font-size:12px;font-size:.75rem;line-height:1.5}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:focus,.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-touch .leaflet-bar a:first-child{border-top-left-radius:2px;border-top-right-radius:2px}.leaflet-touch .leaflet-bar a:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:bold 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:22px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-scrollbar{overflow-y:scroll;overflow-x:hidden;padding-right:5px}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block;font-size:13px;font-size:1.08333em}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-default-icon-path{background-image:url(images/marker-icon.png)}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.8);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333;line-height:1.4}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:focus,.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-attribution-flag{display:inline!important;vertical-align:baseline!important;width:1em;height:.6669em}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;-moz-box-sizing:border-box;box-sizing:border-box;background:rgba(255,255,255,.8);text-shadow:1px 1px #fff}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;font-size:1.08333em;min-height:1px}.leaflet-popup-content p{margin:17px 0;margin:1.3em 0}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:0 0}.leaflet-container a.leaflet-popup-close-button:focus,.leaflet-container a.leaflet-popup-close-button:hover{color:#585858}.leaflet-popup-scrolled{overflow:auto}.leaflet-oldie .leaflet-popup-content-wrapper{-ms-zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.4)}.leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before,.leaflet-tooltip-top:before{position:absolute;pointer-events:none;border:6px solid transparent;background:0 0;content:""}.leaflet-tooltip-bottom{margin-top:6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-6px}.leaflet-tooltip-top:before{bottom:0;margin-bottom:-12px;border-top-color:#fff}.leaflet-tooltip-bottom:before{top:0;margin-top:-12px;margin-left:-6px;border-bottom-color:#fff}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{top:50%;margin-top:-6px}.leaflet-tooltip-left:before{right:0;margin-right:-12px;border-left-color:#fff}.leaflet-tooltip-right:before{left:0;margin-left:-12px;border-right-color:#fff}@media print{.leaflet-control{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+<style>
+/* Layout: a trip bar on top, then the verdict and both providers beside a shared map (stacks on phones). */
+:root {
+  --bg: #f3f5f2;
+  --panel: #ffffff;
+  --ink: #18201c;
+  --muted: #5b6760;
+  --line: #d9dfda;
+  --sign: #1d5c43;          /* highway-sign green, the accent */
+  --sign-ink: #ffffff;
+  --google: #1f6fd1;        /* Google route line */
+  --apple: #d2475f;         /* Apple route line */
+  --good: #1f8a4c;
+  --warn: #a8641b;
+  --map-bg: #e7ebe6;
+  --display: "Overpass", "Highway Gothic", "Arial Narrow", system-ui, sans-serif;
+  --body: "Overpass", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Overpass Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111613; --panel: #1a211d; --ink: #e8eee9; --muted: #9aa69f; --line: #2c3631;
+    --sign: #2f8a63; --sign-ink: #ffffff; --google: #5c9cf0; --apple: #f0738a;
+    --good: #4cc27f; --warn: #e0a25a; --map-bg: #1f2622; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111613; --panel: #1a211d; --ink: #e8eee9; --muted: #9aa69f; --line: #2c3631;
+  --sign: #2f8a63; --sign-ink: #ffffff; --google: #5c9cf0; --apple: #f0738a;
+  --good: #4cc27f; --warn: #e0a25a; --map-bg: #1f2622; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 32px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 16px; }
+header.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.shield {
+  display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 8px;
+  background: var(--sign); color: var(--sign-ink); font: 800 15px/1 var(--display); letter-spacing: .02em;
+  border: 2px solid var(--sign-ink); outline: 2px solid var(--sign);
+}
+h1 { margin: 0; font: 800 22px/1.1 var(--display); letter-spacing: .01em; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); font-size: 13px; }
+.status { display: flex; gap: 8px; flex-wrap: wrap; font: 600 12px/1 var(--mono); }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.pill.on .dot { background: var(--good); }
+.pill.off .dot { background: var(--warn); }
+button.linkish { background: none; border: 0; color: var(--sign); font: 600 13px var(--body); cursor: pointer; padding: 6px 4px; text-decoration: underline; }
+
+form.trip {
+  display: grid; grid-template-columns: 1fr auto 1fr auto auto; gap: 10px; align-items: end;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+}
+label { display: grid; gap: 4px; font: 600 11px/1 var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); min-width: 0; }
+input[type="text"], input[type="password"] {
+  width: 100%; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg);
+  color: var(--ink); font: 400 15px var(--body); text-transform: none; letter-spacing: 0;
+}
+input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--sign); outline-offset: 2px; }
+.swap { height: 44px; width: 44px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; font-size: 18px; }
+.modes { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; height: 44px; }
+.modes button { border: 0; background: var(--bg); color: var(--muted); padding: 0 12px; font: 600 13px var(--body); cursor: pointer; }
+.modes button[aria-pressed="true"] { background: var(--sign); color: var(--sign-ink); }
+.go { height: 44px; padding: 0 20px; border-radius: 8px; border: 0; background: var(--sign); color: var(--sign-ink); font: 800 15px var(--display); letter-spacing: .03em; cursor: pointer; }
+.go:disabled { opacity: .6; cursor: progress; }
+
+.verdict {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--sign); color: var(--sign-ink); border-radius: 12px; padding: 14px 18px;
+}
+.verdict strong { font: 800 20px/1.2 var(--display); }
+.verdict span { font-size: 13px; opacity: .9; }
+.verdict .tag { font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; padding: 5px 8px; border: 1px solid currentColor; border-radius: 6px; }
+
+.main { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.providers { display: grid; gap: 12px; min-width: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; min-width: 0; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.card-head h2 { margin: 0; font: 800 16px/1 var(--display); display: flex; align-items: center; gap: 8px; }
+.swatch { width: 18px; height: 5px; border-radius: 3px; }
+.card[data-p="google"] .swatch { background: var(--google); }
+.card[data-p="apple"] .swatch { background: var(--apple); }
+.badge { font: 600 11px/1 var(--mono); padding: 4px 7px; border-radius: 5px; background: var(--good); color: #fff; }
+.card-body { padding: 14px; display: grid; gap: 12px; }
+.eta { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.eta b { font: 800 34px/1 var(--display); font-variant-numeric: tabular-nums; }
+.eta .meta { color: var(--muted); font: 400 13px var(--mono); font-variant-numeric: tabular-nums; }
+.alts { display: grid; gap: 6px; }
+.alt {
+  display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); text-align: left; cursor: pointer; font: 400 14px var(--body);
+}
+.alt[aria-pressed="true"] { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.card[data-p="google"] .alt[aria-pressed="true"] { color: var(--google); }
+.card[data-p="apple"] .alt[aria-pressed="true"] { color: var(--apple); }
+.alt .n { font: 600 13px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.alt .nm { color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+details { border-top: 1px dashed var(--line); padding-top: 8px; }
+summary { cursor: pointer; font: 600 13px var(--body); color: var(--muted); }
+ol.steps { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
+ol.steps .d { color: var(--muted); font: 400 12px var(--mono); margin-left: 6px; }
+.start {
+  display: inline-flex; justify-content: center; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 8px;
+  font: 800 14px var(--display); text-decoration: none; color: #fff;
+}
+.card[data-p="google"] .start { background: var(--google); }
+.card[data-p="apple"] .start { background: var(--apple); }
+.err { color: var(--warn); font-size: 14px; margin: 0; overflow-wrap: anywhere; }
+
+.mapbox { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); min-width: 0; }
+#map { height: min(72vh, 640px); min-height: 340px; border-radius: 12px; border: 1px solid var(--line); background: var(--map-bg); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font: 400 12px var(--mono); color: var(--muted); }
+.legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.leaflet-container { font-family: var(--body); background: var(--map-bg); }
+
+dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); max-width: 560px; width: calc(100% - 32px); padding: 0; }
+dialog::backdrop { background: rgba(0,0,0,.45); }
+.dlg { padding: 18px; display: grid; gap: 14px; }
+.dlg h3 { margin: 0; font: 800 18px var(--display); }
+.dlg p { margin: 0; font-size: 14px; color: var(--muted); }
+.dlg .row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.dlg .ghost { height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 600 14px var(--body); cursor: pointer; }
+.dlg a { color: var(--sign); }
+
+@media (max-width: 900px) {
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .mapbox { position: static; order: -1; }
+  #map { height: 46vh; }
+}
+@media (max-width: 640px) {
+  form.trip { grid-template-columns: minmax(0, 1fr) auto; }
+  form.trip label:nth-of-type(2) { grid-column: 1 / 2; }
+  .swap { grid-column: 2; grid-row: 1; align-self: end; }
+  .modes { grid-column: 1 / -1; }
+  .modes button { flex: 1; }
+  .go { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="bar">
+    <div class="brand">
+      <span class="shield" aria-hidden="true">G·A</span>
+      <div>
+        <h1>Two-Map Navigator</h1>
+        <p class="sub">Routes from Google Maps and Apple Maps, compared on one map.</p>
+      </div>
+    </div>
+    <div class="status">
+      <span class="pill" id="st-google"><span class="dot"></span>Google</span>
+      <span class="pill" id="st-apple"><span class="dot"></span>Apple</span>
+      <button class="linkish" type="button" id="open-keys">API keys</button>
+    </div>
+  </header>
+
+  <form class="trip" id="trip" autocomplete="on">
+    <label for="origin">From
+      <input type="text" id="origin" name="origin" placeholder="Address, place, or lat,lng" required>
+    </label>
+    <button class="swap" type="button" id="swap" aria-label="Swap start and destination">⇄</button>
+    <label for="destination">To
+      <input type="text" id="destination" name="destination" placeholder="Where are you going?" required>
+    </label>
+    <div class="modes" role="group" aria-label="Travel mode">
+      <button type="button" data-mode="drive" aria-pressed="true">Drive</button>
+      <button type="button" data-mode="walk" aria-pressed="false">Walk</button>
+      <button type="button" data-mode="bike" aria-pressed="false">Bike</button>
+    </div>
+    <button class="go" type="submit" id="go">Compare routes</button>
+  </form>
+
+  <section class="verdict" id="verdict" aria-live="polite">
+    <div><strong id="v-title">Loading sample trip…</strong><br><span id="v-sub"></span></div>
+    <span class="tag" id="v-tag">Sample data</span>
+  </section>
+
+  <div class="main">
+    <div class="providers">
+      <article class="card" data-p="google" id="card-google"></article>
+      <article class="card" data-p="apple" id="card-apple"></article>
+    </div>
+    <div class="mapbox">
+      <div id="map" role="img" aria-label="Map showing the Google and Apple routes"></div>
+      <div class="legend"><span><i style="background:var(--google)"></i>Google Maps</span><span><i style="background:var(--apple)"></i>Apple Maps</span><span>Thin lines are alternatives</span></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="keys">
+  <form class="dlg" method="dialog" id="keys-form">
+    <h3>API keys</h3>
+    <p id="keys-mode-note"></p>
+    <label for="k-google">Google Maps API key (Routes API enabled)
+      <input type="password" id="k-google" placeholder="AIza…" autocomplete="off">
+    </label>
+    <label for="k-apple">Apple Maps token (MapKit JS / Maps token, a JWT)
+      <input type="password" id="k-apple" placeholder="eyJ…" autocomplete="off">
+    </label>
+    <p>Keys you paste here stay in this browser only. How to get them: <a href="https://developers.google.com/maps/documentation/routes/get-api-key" target="_blank" rel="noopener">Google key</a> · <a href="https://developer.apple.com/documentation/applemapsserverapi/creating-a-maps-token" target="_blank" rel="noopener">Apple token</a>.</p>
+    <div class="row">
+      <button class="ghost" type="button" id="k-clear">Clear keys</button>
+      <button class="ghost" type="button" id="k-demo">Show sample trip</button>
+      <button class="go" type="submit" id="k-save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script type="module">
+import { fetchGoogleRoutes, fetchAppleRoutes, demoRoutes, handoffLinks } from "./providers.js";
+
+const $ = (s) => document.querySelector(s);
+const state = { mode: "drive", server: null, result: null, selected: { google: 0, apple: 0 } };
+const store = {
+  get(k) { try { return localStorage.getItem(k) || ""; } catch { return ""; } },
+  set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} },
+};
+
+// ---- formatting
+const fmtDur = (s) => {
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m} min`;
+  return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")} min`;
+};
+const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(m >= 10000 ? 0 : 1)} km` : `${Math.round(m)} m`);
+const fmtMi = (m) => `${(m / 1609.344).toFixed(1)} mi`;
+const arrive = (s) => new Date(Date.now() + s * 1000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// ---- map
+let map = null, layers = null;
+function initMap() {
+  if (!window.L) return;
+  map = L.map("map", { zoomControl: true, attributionControl: true }).setView([37.78, -122.43], 12);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19, attribution: "Map tiles &copy; OpenStreetMap contributors",
+  }).addTo(map);
+  layers = L.layerGroup().addTo(map);
+}
+function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function drawMap() {
+  if (!map || !state.result) return;
+  layers.clearLayers();
+  const bounds = [];
+  for (const p of ["google", "apple"]) {
+    const r = state.result[p];
+    if (!r?.ok) continue;
+    const color = cssVar(p === "google" ? "--google" : "--apple");
+    r.routes.forEach((route, i) => {
+      if (!route.path.length) return;
+      const sel = i === state.selected[p];
+      const line = L.polyline(route.path, {
+        color, weight: sel ? 6 : 3, opacity: sel ? 0.9 : 0.45, dashArray: sel ? null : "6 8",
+        offset: 0,
+      }).bindTooltip(`${p === "google" ? "Google" : "Apple"}: ${fmtDur(route.durationSec)} · ${esc(route.name)}`);
+      line.on("click", () => selectRoute(p, i));
+      line.addTo(layers);
+      if (sel) line.bringToFront();
+      bounds.push(...route.path);
+    });
+  }
+  if (bounds.length) {
+    const ink = cssVar("--ink");
+    L.circleMarker(bounds[0], { radius: 7, color: ink, fillColor: cssVar("--panel"), fillOpacity: 1, weight: 3 }).bindTooltip("Start").addTo(layers);
+    const last = state.result.google?.ok ? state.result.google.routes[0].path.at(-1) : bounds.at(-1);
+    L.circleMarker(last, { radius: 7, color: ink, fillColor: ink, fillOpacity: 1, weight: 3 }).bindTooltip("Destination").addTo(layers);
+    map.fitBounds(L.latLngBounds(bounds), { padding: [30, 30] });
+  }
+}
+
+// ---- rendering
+function renderCard(p) {
+  const el = $(`#card-${p}`);
+  const name = p === "google" ? "Google Maps" : "Apple Maps";
+  const r = state.result?.[p];
+  const links = handoffLinks(state.result?.origin || $("#origin").value, state.result?.destination || $("#destination").value, state.mode);
+  const fastest = fastestProvider();
+  let body;
+  if (!r) {
+    body = `<p class="err">No result yet.</p>`;
+  } else if (!r.ok) {
+    body = `<p class="err">${esc(r.error)}</p>`;
+  } else {
+    const route = r.routes[state.selected[p]] || r.routes[0];
+    body = `
+      <div class="eta"><b>${fmtDur(route.durationSec)}</b>
+        <span class="meta">${fmtDist(route.distanceM)} · ${fmtMi(route.distanceM)}<br>arrive ~${arrive(route.durationSec)}</span></div>
+      <div class="alts">${r.routes.map((rt, i) => `
+        <button type="button" class="alt" data-p="${p}" data-i="${i}" aria-pressed="${i === state.selected[p]}">
+          <span class="nm">${esc(rt.name)}</span><span class="n">${fmtDur(rt.durationSec)} · ${fmtDist(rt.distanceM)}</span>
+        </button>`).join("")}</div>
+      ${route.steps.length ? `<details><summary>${route.steps.length} turn-by-turn steps</summary>
+        <ol class="steps">${route.steps.map((s) => `<li>${esc(s.instruction)}<span class="d">${fmtDist(s.distanceM)}</span></li>`).join("")}</ol></details>` : ""}`;
+  }
+  el.innerHTML = `
+    <div class="card-head"><h2><span class="swatch"></span>${name}</h2>${fastest === p ? `<span class="badge">FASTEST</span>` : ""}</div>
+    <div class="card-body">${body}
+      <a class="start" href="${esc(links[p])}" target="_blank" rel="noopener">Start in ${name} ↗</a>
+    </div>`;
+}
+function fastestProvider() {
+  const g = state.result?.google, a = state.result?.apple;
+  if (!g?.ok || !a?.ok) return g?.ok ? "google" : a?.ok ? "apple" : null;
+  const gs = Math.min(...g.routes.map((r) => r.durationSec));
+  const as = Math.min(...a.routes.map((r) => r.durationSec));
+  if (Math.abs(gs - as) < 30) return null;
+  return gs < as ? "google" : "apple";
+}
+function renderVerdict() {
+  const g = state.result?.google, a = state.result?.apple;
+  const title = $("#v-title"), sub = $("#v-sub"), tag = $("#v-tag");
+  tag.textContent = state.result?.demo ? "Sample data" : "Live";
+  if (!g?.ok && !a?.ok) {
+    title.textContent = "No routes yet";
+    sub.textContent = "Neither service answered. Check the messages below each card.";
+    return;
+  }
+  if (!g?.ok || !a?.ok) {
+    const ok = g?.ok ? "Google Maps" : "Apple Maps";
+    const best = (g?.ok ? g : a).routes[0];
+    title.textContent = `${ok}: ${fmtDur(best.durationSec)}, ${fmtDist(best.distanceM)}`;
+    sub.textContent = `Only ${ok} returned a route, so there's nothing to compare yet.`;
+    return;
+  }
+  const gb = g.routes.reduce((x, y) => (y.durationSec < x.durationSec ? y : x));
+  const ab = a.routes.reduce((x, y) => (y.durationSec < x.durationSec ? y : x));
+  const diff = Math.abs(gb.durationSec - ab.durationSec);
+  const both = `Google ${fmtDur(gb.durationSec)} ${gb.name} · Apple ${fmtDur(ab.durationSec)} ${ab.name}`;
+  if (diff < 30) {
+    title.textContent = `Both say about ${fmtDur(gb.durationSec)}`;
+  } else {
+    const winner = gb.durationSec < ab.durationSec ? "Google Maps" : "Apple Maps";
+    title.textContent = `${winner} is ${fmtDur(diff)} faster`;
+  }
+  sub.textContent = `${both}${state.result.demo ? " (illustrative times, not live)" : ""}`;
+}
+function render() {
+  renderVerdict();
+  renderCard("google");
+  renderCard("apple");
+  drawMap();
+}
+function selectRoute(p, i) {
+  state.selected[p] = i;
+  render();
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest(".alt");
+  if (b) selectRoute(b.dataset.p, Number(b.dataset.i));
+});
+
+// ---- data
+async function settle(promise) {
+  try { return { ok: true, ...(await promise) }; } catch (err) { return { ok: false, error: friendly(err) }; }
+}
+function friendly(err) {
+  const msg = err?.message || String(err);
+  if (/Failed to fetch|NetworkError|Load failed/i.test(msg)) {
+    return "Couldn't reach the service from this page. Pages hosted on claude.ai can't call outside services, so run the app on your computer (see the README) to get live routes.";
+  }
+  return msg;
+}
+async function lookUp(origin, destination) {
+  const mode = state.mode;
+  if (state.server) {
+    const res = await fetch("api/routes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ origin, destination, mode }) });
+    return res.json();
+  }
+  const gKey = store.get("nav.googleKey"), aTok = store.get("nav.appleToken");
+  const [google, apple] = await Promise.all([
+    gKey ? settle(fetchGoogleRoutes({ apiKey: gKey, origin, destination, mode })) : { ok: false, error: "Add a Google Maps API key (API keys, top right) to get Google routes." },
+    aTok ? settle(fetchAppleRoutes({ authToken: aTok, origin, destination, mode })) : { ok: false, error: "Add an Apple Maps token (API keys, top right) to get Apple routes." },
+  ]);
+  return { origin, destination, mode, google, apple };
+}
+function showDemo() {
+  const d = demoRoutes();
+  $("#origin").value = d.origin;
+  $("#destination").value = d.destination;
+  state.result = { demo: true, origin: d.origin, destination: d.destination, google: { ok: true, ...d.google }, apple: { ok: true, ...d.apple } };
+  state.selected = { google: 0, apple: 0 };
+  render();
+}
+
+$("#trip").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const origin = $("#origin").value.trim(), destination = $("#destination").value.trim();
+  if (!origin || !destination) return;
+  const go = $("#go");
+  go.disabled = true; go.textContent = "Asking both maps…";
+  $("#v-title").textContent = "Asking Google and Apple…";
+  $("#v-sub").textContent = `${origin} → ${destination}`;
+  try {
+    state.result = await lookUp(origin, destination);
+    state.selected = { google: 0, apple: 0 };
+    render();
+  } catch (err) {
+    $("#v-title").textContent = "Something went wrong";
+    $("#v-sub").textContent = friendly(err);
+  } finally {
+    go.disabled = false; go.textContent = "Compare routes";
+  }
+});
+$("#swap").addEventListener("click", () => {
+  const o = $("#origin"), d = $("#destination");
+  [o.value, d.value] = [d.value, o.value];
+});
+document.querySelectorAll(".modes button").forEach((b) =>
+  b.addEventListener("click", () => {
+    state.mode = b.dataset.mode;
+    document.querySelectorAll(".modes button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  })
+);
+
+// ---- keys dialog and status
+function setPill(p, on, label) {
+  const el = $(`#st-${p}`);
+  el.className = `pill ${on ? "on" : "off"}`;
+  el.lastChild.textContent = label;
+}
+function refreshStatus() {
+  const cfg = state.server || { google: !!store.get("nav.googleKey"), apple: !!store.get("nav.appleToken") };
+  setPill("google", cfg.google, cfg.google ? "Google ready" : "Google: no key");
+  setPill("apple", cfg.apple, cfg.apple ? "Apple ready" : "Apple: no token");
+}
+$("#open-keys").addEventListener("click", () => {
+  $("#keys-mode-note").textContent = state.server
+    ? "This app is running on your own server, which already holds the keys from its .env file. Edit .env and restart to change them; the fields below aren't used."
+    : "Paste your keys to look up live routes straight from this browser. On claude.ai this page can only show the sample trip, since hosted pages can't call outside services.";
+  $("#k-google").value = store.get("nav.googleKey");
+  $("#k-apple").value = store.get("nav.appleToken");
+  $("#keys").showModal();
+});
+$("#keys-form").addEventListener("submit", () => {
+  store.set("nav.googleKey", $("#k-google").value.trim());
+  store.set("nav.appleToken", $("#k-apple").value.trim());
+  refreshStatus();
+});
+$("#k-clear").addEventListener("click", () => {
+  $("#k-google").value = ""; $("#k-apple").value = "";
+  store.set("nav.googleKey", ""); store.set("nav.appleToken", "");
+  refreshStatus();
+});
+$("#k-demo").addEventListener("click", () => { $("#keys").close(); showDemo(); });
+
+// ---- boot
+async function boot() {
+  initMap();
+  try {
+    const res = await fetch("api/config", { cache: "no-store" });
+    if (res.ok && (res.headers.get("content-type") || "").includes("json")) state.server = await res.json();
+  } catch {}
+  refreshStatus();
+  showDemo();
+}
+boot();
+</script>

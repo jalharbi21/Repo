@@ -1,0 +1,12 @@
+{
+  "name": "dual-maps-navigation",
+  "version": "1.0.0",
+  "description": "Compare driving, walking and cycling routes from Google Maps and Apple Maps side by side.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  }
+}
