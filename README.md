@@ -24,6 +24,14 @@ cp .env.example .env     # then fill in your keys
 npm start                # opens on http://localhost:3000
 ```
 
+### Compiled build
+
+```bash
+npm install          # installs the build tool (esbuild)
+npm run build        # bundles and minifies into dist/
+npm run start:prod   # runs dist/server.js
+```
+
 ## Keys you need
 
 Each provider is optional. With only one set up, the app shows that one and says the other is missing.
