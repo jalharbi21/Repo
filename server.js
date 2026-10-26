@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { createPrivateKey, sign } from "node:crypto";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchGoogleRoutes, fetchAppleRoutes, getAppleAccessToken, demoRoutes } from "./public/providers.js";
+import { fetchGoogleRoutes, fetchAppleRoutes, getAppleAccessToken, demoRoutes, mergeRoutes } from "./public/providers.js";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC = join(ROOT, "public");
@@ -73,26 +73,28 @@ async function settle(promise) {
   }
 }
 
+// Asks both services, then returns one list with the fastest route first.
 async function handleRoutes(body) {
   const { origin, destination, mode = "drive", demo } = body || {};
+  const opts = { avoidTolls: Boolean(body?.avoidTolls), avoidHighways: Boolean(body?.avoidHighways) };
   if (demo) {
-    const d = demoRoutes();
-    return { demo: true, origin: d.origin, destination: d.destination, google: { ok: true, ...d.google }, apple: { ok: true, ...d.apple } };
+    const d = await demoRoutes(opts);
+    return { ...d, ...mergeRoutes(d, opts) };
   }
   if (!origin || !destination) return { status: 400, error: "Enter both a start and a destination" };
   const cfg = config();
   const [google, apple] = await Promise.all([
     cfg.google
-      ? settle(fetchGoogleRoutes({ apiKey: GOOGLE_KEY, origin, destination, mode }))
-      : { ok: false, error: "Google isn't set up on the server (GOOGLE_MAPS_API_KEY)" },
+      ? settle(fetchGoogleRoutes({ apiKey: GOOGLE_KEY, origin, destination, mode, ...opts }))
+      : { ok: false, error: "Google Maps isn't set up on the server (GOOGLE_MAPS_API_KEY)" },
     cfg.apple
-      ? settle(appleAccessToken().then((accessToken) => fetchAppleRoutes({ accessToken, origin, destination, mode })))
-      : { ok: false, error: "Apple isn't set up on the server (see README)" },
+      ? settle(appleAccessToken().then((accessToken) => fetchAppleRoutes({ accessToken, origin, destination, mode, ...opts })))
+      : { ok: false, error: "Apple Maps isn't set up on the server (see README)" },
   ]);
-  return { origin, destination, mode, google, apple };
+  return { origin, destination, mode, ...opts, google, apple, ...mergeRoutes({ google, apple }, opts) };
 }
 
-const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml" };
+const TYPES = { ".json": "application/json; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml" };
 
 function send(res, status, body, type = "application/json; charset=utf-8") {
   res.writeHead(status, { "Content-Type": type, "Cache-Control": "no-store" });

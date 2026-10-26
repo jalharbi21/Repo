@@ -49,7 +49,7 @@ async function readError(res, label) {
 }
 
 // Google Routes API: https://developers.google.com/maps/documentation/routes
-export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "drive", fetchImpl = fetch }) {
+export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "drive", avoidTolls = false, avoidHighways = false, fetchImpl = fetch }) {
   if (!apiKey) throw new Error("No Google API key set");
   const travelMode = GOOGLE_MODES[mode] || "DRIVE";
   const body = {
@@ -60,7 +60,11 @@ export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "d
     languageCode: "en-US",
     units: "METRIC",
   };
-  if (travelMode === "DRIVE") body.routingPreference = "TRAFFIC_AWARE";
+  if (travelMode === "DRIVE") {
+    body.routingPreference = "TRAFFIC_AWARE";
+    body.extraComputations = ["TOLLS"];
+    body.routeModifiers = { avoidTolls, avoidHighways };
+  }
   const res = await fetchImpl("https://routes.googleapis.com/directions/v2:computeRoutes", {
     method: "POST",
     headers: {
@@ -73,6 +77,7 @@ export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "d
         "routes.polyline.encodedPolyline",
         "routes.staticDuration",
         "routes.warnings",
+        "routes.travelAdvisory.tollInfo",
         "routes.legs.steps.distanceMeters",
         "routes.legs.steps.staticDuration",
         "routes.legs.steps.polyline.encodedPolyline",
@@ -108,6 +113,8 @@ export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "d
         name: r.description ? `via ${r.description}` : `Route ${i + 1}`,
         durationSec,
         trafficDelaySec: Math.max(0, durationSec - staticSec),
+        hasTolls: Boolean(r.travelAdvisory?.tollInfo),
+        toll: googleTollPrice(r.travelAdvisory?.tollInfo),
         distanceM: r.distanceMeters || 0,
         warnings: r.warnings || [],
         path,
@@ -115,6 +122,17 @@ export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "d
       };
     }),
   };
+}
+
+// Sum of Google's estimated toll prices, e.g. { amount: 6.94, currency: "USD" }. Null when unknown.
+function googleTollPrice(info) {
+  const prices = info?.estimatedPrice || [];
+  if (!prices.length) return null;
+  const currency = prices[0].currencyCode;
+  const amount = prices
+    .filter((p) => p.currencyCode === currency)
+    .reduce((t, p) => t + Number(p.units || 0) + Number(p.nanos || 0) / 1e9, 0);
+  return { amount: Math.round(amount * 100) / 100, currency };
 }
 
 function googleStep(st, startIdx) {
@@ -174,7 +192,7 @@ export async function getAppleAccessToken({ authToken, fetchImpl = fetch }) {
   return data.accessToken;
 }
 
-export async function fetchAppleRoutes({ authToken, accessToken, origin, destination, mode = "drive", fetchImpl = fetch }) {
+export async function fetchAppleRoutes({ authToken, accessToken, origin, destination, mode = "drive", avoidTolls = false, fetchImpl = fetch }) {
   const token = accessToken || (await getAppleAccessToken({ authToken, fetchImpl }));
   const params = new URLSearchParams({
     origin: origin.trim(),
@@ -183,6 +201,7 @@ export async function fetchAppleRoutes({ authToken, accessToken, origin, destina
     requestsAlternateRoutes: "true",
     lang: "en-US",
   });
+  if (avoidTolls) params.set("avoid", "Tolls"); // Apple can avoid tolls, but has no option to avoid highways
   const res = await fetchImpl(`https://maps-api.apple.com/v1/directions?${params}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -217,8 +236,10 @@ export async function fetchAppleRoutes({ authToken, accessToken, origin, destina
         name: r.name ? `via ${r.name}` : `Route ${i + 1}`,
         durationSec: r.durationSeconds || 0,
         trafficDelaySec: 0,
+        hasTolls: Boolean(r.hasTolls),
+        toll: null, // Apple says whether a route has tolls, not what they cost
         distanceM: r.distanceMeters || 0,
-        warnings: r.hasTolls ? ["This route has tolls"] : [],
+        warnings: [],
         path,
         steps: outSteps,
       };
@@ -226,76 +247,104 @@ export async function fetchAppleRoutes({ authToken, accessToken, origin, destina
   };
 }
 
-// Sample data so the app can be tried before any keys are set.
-// Ferry Building -> Golden Gate Park (San Francisco). Times and paths are illustrative, not live.
-export function demoRoutes() {
-  const ferry = [37.7955, -122.3937];
-  const google = {
-    provider: "google",
-    routes: [
-      {
-        name: "via Fell St",
-        durationSec: 1260,
-        distanceM: 7400,
-        path: [ferry, [37.7929, -122.3967], [37.7845, -122.4073], [37.7795, -122.4138], [37.7766, -122.4194], [37.7739, -122.4307], [37.7726, -122.4408], [37.7711, -122.4537], [37.7694, -122.4658]],
-        steps: [
-          { instruction: "Head southwest on The Embarcadero", distanceM: 350, startIdx: 0 },
-          { instruction: "Turn right onto Market St", distanceM: 2400, startIdx: 1 },
-          { instruction: "Continue onto Fell St", distanceM: 3600, startIdx: 4 },
-          { instruction: "Turn left into Golden Gate Park", distanceM: 1050, startIdx: 7 },
-        ],
-      },
-      {
-        name: "via Oak St",
-        durationSec: 1440,
-        distanceM: 7900,
-        path: [ferry, [37.7929, -122.3967], [37.7845, -122.4073], [37.7772, -122.4166], [37.7752, -122.4244], [37.7731, -122.4360], [37.7713, -122.4480], [37.7694, -122.4658]],
-        steps: [
-          { instruction: "Head southwest on The Embarcadero", distanceM: 350, startIdx: 0 },
-          { instruction: "Turn right onto Market St", distanceM: 2700, startIdx: 1 },
-          { instruction: "Turn right onto Oak St", distanceM: 3900, startIdx: 3 },
-          { instruction: "Arrive at Golden Gate Park", distanceM: 950, startIdx: 6 },
-        ],
-      },
-    ],
-  };
-  const apple = {
-    provider: "apple",
-    routes: [
-      {
-        name: "via Turk Blvd",
-        durationSec: 1320,
-        distanceM: 7700,
-        path: [ferry, [37.7944, -122.3995], [37.7878, -122.4081], [37.7835, -122.4161], [37.7812, -122.4265], [37.7790, -122.4394], [37.7772, -122.4520], [37.7731, -122.4590], [37.7694, -122.4658]],
-        steps: [
-          { instruction: "Head west on Washington St", distanceM: 900, startIdx: 0 },
-          { instruction: "Turn left onto Kearny St", distanceM: 700, startIdx: 1 },
-          { instruction: "Turn right onto Turk Blvd", distanceM: 4800, startIdx: 3 },
-          { instruction: "Turn left onto Stanyan St", distanceM: 1300, startIdx: 6 },
-        ],
-      },
-      {
-        name: "via Fell St",
-        durationSec: 1380,
-        distanceM: 7450,
-        path: [ferry, [37.7929, -122.3967], [37.7845, -122.4073], [37.7795, -122.4138], [37.7766, -122.4194], [37.7739, -122.4307], [37.7726, -122.4408], [37.7711, -122.4537], [37.7694, -122.4658]],
-        steps: [
-          { instruction: "Head southwest on The Embarcadero", distanceM: 350, startIdx: 0 },
-          { instruction: "Turn right onto Market St", distanceM: 2400, startIdx: 1 },
-          { instruction: "Continue onto Fell St", distanceM: 3650, startIdx: 4 },
-          { instruction: "Turn left into Golden Gate Park", distanceM: 1050, startIdx: 7 },
-        ],
-      },
-    ],
-  };
-  for (const r of [...google.routes, ...apple.routes]) {
-    r.trafficDelaySec = 0;
-    r.warnings = [];
-    for (const st of r.steps) {
-      st.maneuver = maneuverFrom(null, st.instruction);
-      st.street = streetFrom(st.instruction);
-      st.durationSec = Math.round((st.distanceM / r.distanceM) * r.durationSec);
+// ---- Combining both providers into one ranked list
+
+function samplePath(path, n = 24) {
+  if (path.length <= n) return path;
+  return Array.from({ length: n }, (_, i) => path[Math.round((i * (path.length - 1)) / (n - 1))]);
+}
+function metres(a, b) {
+  const k = Math.PI / 180;
+  const x = (b[1] - a[1]) * k * Math.cos(((a[0] + b[0]) / 2) * k);
+  const y = (b[0] - a[0]) * k;
+  return Math.sqrt(x * x + y * y) * 6371000;
+}
+// Average distance from points on one line to the nearest sampled point on the other.
+function pathGap(p, q) {
+  const a = samplePath(p), b = samplePath(q, 80);
+  return a.reduce((t, pt) => t + Math.min(...b.map((x) => metres(pt, x))), 0) / a.length;
+}
+export function sameRoad(r1, r2) {
+  const d = Math.abs(r1.distanceM - r2.distanceM) / Math.max(r1.distanceM, r2.distanceM, 1);
+  return d < 0.05 && pathGap(r1.path, r2.path) < 250;
+}
+
+// Takes { google, apple } results and options, returns one list with the fastest route first.
+export function mergeRoutes(results, { avoidTolls = false, avoidHighways = false } = {}) {
+  const notes = [];
+  let list = [];
+  for (const provider of ["google", "apple"]) {
+    const r = results[provider];
+    if (r?.ok) for (const route of r.routes) list.push({ ...route, provider, sources: [provider] });
+  }
+  // Apple has no "avoid highways" option, so its routes can't be trusted to honor it.
+  if (avoidHighways && list.some((r) => r.provider === "google")) {
+    list = list.filter((r) => r.provider !== "apple");
+  } else if (avoidHighways && list.length) {
+    notes.push("Only Apple Maps answered, and it can't avoid highways, so these routes may use them.");
+  }
+  if (avoidTolls) {
+    const free = list.filter((r) => !r.hasTolls);
+    if (free.length) list = free;
+    else if (list.length) notes.push("No toll-free route was found, so these routes include tolls.");
+  }
+  // Apple doesn't price tolls: borrow Google's price when both found the same road.
+  for (const r of list) {
+    if (r.hasTolls && !r.toll) {
+      const twin = list.find((g) => g.toll && sameRoad(g, r));
+      if (twin) r.toll = { ...twin.toll, estimated: true };
     }
   }
-  return { origin: "Ferry Building, San Francisco", destination: "Golden Gate Park, San Francisco", google, apple };
+  list.sort((a, b) => a.durationSec - b.durationSec);
+  // When both services suggest the same road, keep the faster estimate and remember both agreed.
+  const kept = [];
+  for (const r of list) {
+    const dup = kept.find((k) => k.provider !== r.provider && sameRoad(k, r));
+    if (dup) {
+      if (!dup.sources.includes(r.provider)) dup.sources.push(r.provider);
+      if (!dup.toll && r.toll) dup.toll = r.toll;
+    } else kept.push(r);
+  }
+  return { routes: kept, notes };
+}
+
+// ---- Sample trip, so the app can be tried before any keys are set
+
+let demoCache = null;
+async function loadDemoTrip() {
+  if (!demoCache) demoCache = (await import("./demo-trip.js")).DEMO_TRIP;
+  return demoCache;
+}
+
+function demoRoute(base, name, extra) {
+  return {
+    name,
+    durationSec: base.durationSec,
+    distanceM: base.distanceM,
+    trafficDelaySec: 0,
+    warnings: [],
+    path: base.path,
+    steps: base.steps.map((s) => ({ ...s, maneuver: maneuverFrom(null, s.instruction), street: streetFrom(s.instruction) })),
+    ...extra,
+  };
+}
+
+// Mimics what each service returns for the sample trip, honoring the same avoid options they do.
+export async function demoRoutes({ avoidTolls = false, avoidHighways = false } = {}) {
+  const t = await loadDemoTrip();
+  const fast = demoRoute(t.routes.fast, "via Queens-Midtown Tunnel and Van Wyck Expy", { hasTolls: true, toll: { amount: 6.94, currency: "USD" } });
+  const free = demoRoute(t.routes.free, "via Queensboro Bridge and Long Island Expy", { hasTolls: false, toll: null });
+  const local = demoRoute(t.routes.local, "via Queensboro Bridge and Woodhaven Blvd", { hasTolls: false, toll: null });
+  const appleFast = { ...fast, durationSec: fast.durationSec + 140, toll: null };
+  const appleFree = { ...free, durationSec: free.durationSec + 90 };
+  let google = avoidHighways ? [local] : [fast, free, local];
+  if (avoidTolls) google = google.filter((r) => !r.hasTolls);
+  const apple = avoidTolls ? [appleFree] : [appleFast, appleFree];
+  return {
+    demo: true,
+    origin: t.origin,
+    destination: t.destination,
+    google: { ok: true, provider: "google", routes: google },
+    apple: { ok: true, provider: "apple", routes: apple },
+  };
 }

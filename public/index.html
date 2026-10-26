@@ -1,242 +1,274 @@
 <title>Two-Map Navigator</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&family=Overpass+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800&family=Overpass+Mono:wght@500&display=swap">
 <style>
 /* Leaflet 1.9.4 stylesheet (BSD-2-Clause), inlined */
 .leaflet-image-layer,.leaflet-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane,.leaflet-pane>canvas,.leaflet-pane>svg,.leaflet-tile,.leaflet-tile-container,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile::selection{background:0 0}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer{max-width:none!important;max-height:none!important;width:auto;padding:0}.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}.leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom;touch-action:none;touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{-ms-touch-action:none;touch-action:none}.leaflet-container{-webkit-tap-highlight-color:transparent}.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{-webkit-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}svg.leaflet-zoom-animated{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab;cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing;cursor:grabbing}.leaflet-image-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-image-layer.leaflet-interactive,.leaflet-marker-icon.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline-offset:1px}.leaflet-container a{color:#0078a8}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;font-size:12px;font-size:.75rem;line-height:1.5}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:focus,.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-touch .leaflet-bar a:first-child{border-top-left-radius:2px;border-top-right-radius:2px}.leaflet-touch .leaflet-bar a:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:bold 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:22px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(images/layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(images/layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-scrollbar{overflow-y:scroll;overflow-x:hidden;padding-right:5px}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block;font-size:13px;font-size:1.08333em}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-default-icon-path{background-image:url(images/marker-icon.png)}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.8);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333;line-height:1.4}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:focus,.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-attribution-flag{display:inline!important;vertical-align:baseline!important;width:1em;height:.6669em}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;-moz-box-sizing:border-box;box-sizing:border-box;background:rgba(255,255,255,.8);text-shadow:1px 1px #fff}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;font-size:1.08333em;min-height:1px}.leaflet-popup-content p{margin:17px 0;margin:1.3em 0}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:0 0}.leaflet-container a.leaflet-popup-close-button:focus,.leaflet-container a.leaflet-popup-close-button:hover{color:#585858}.leaflet-popup-scrolled{overflow:auto}.leaflet-oldie .leaflet-popup-content-wrapper{-ms-zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.4)}.leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before,.leaflet-tooltip-top:before{position:absolute;pointer-events:none;border:6px solid transparent;background:0 0;content:""}.leaflet-tooltip-bottom{margin-top:6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-6px}.leaflet-tooltip-top:before{bottom:0;margin-bottom:-12px;border-top-color:#fff}.leaflet-tooltip-bottom:before{top:0;margin-top:-12px;margin-left:-6px;border-bottom-color:#fff}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{top:50%;margin-top:-6px}.leaflet-tooltip-left:before{right:0;margin-right:-12px;border-left-color:#fff}.leaflet-tooltip-right:before{left:0;margin-left:-12px;border-right-color:#fff}@media print{.leaflet-control{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 <style>
-/* Layout: a trip bar on top, then the verdict and both providers beside a shared map (stacks on phones). */
+/* Layout: a full-bleed map with one floating route panel on the left (stacks under the map on phones).
+   While navigating, the panel gives way to a turn banner on top and a trip bar at the bottom. */
 :root {
-  --bg: #f3f5f2;
+  --bg: #eef1f4;
   --panel: #ffffff;
-  --ink: #18201c;
-  --muted: #5b6760;
-  --line: #d9dfda;
-  --sign: #1d5c43;          /* highway-sign green, the accent */
-  --sign-ink: #ffffff;
-  --google: #1f6fd1;        /* Google route line */
-  --apple: #d2475f;         /* Apple route line */
-  --good: #1f8a4c;
-  --warn: #a8641b;
-  --map-bg: #e7ebe6;
-  --display: "Overpass", "Highway Gothic", "Arial Narrow", system-ui, sans-serif;
+  --ink: #141a23;
+  --muted: #5f6b7a;
+  --line: #e2e6ec;
+  --soft: #f4f6f9;
+  --accent: #2f5bea;          /* the route line and primary actions */
+  --accent-ink: #ffffff;
+  --accent-soft: #e6ecfd;
+  --toll: #a1610a;
+  --toll-soft: #fcf1df;
+  --ok: #1d7f4e;
+  --ok-soft: #e3f4ea;
+  --alt-route: #9aa6b6;
+  /* map */
+  --land: #f2efe9;
+  --water: #a9cbe8;
+  --park: #cfe6c4;
+  --aero: #e4e1ea;
+  --road-minor: #ffffff;
+  --road-mid: #fffaf0;
+  --road-major: #fde3a7;
+  --road-hwy: #f6b26b;
+  --road-case: #d6cfc2;
+  --label: #6d6558;
+  --shadow: 0 1px 2px rgba(20, 26, 35, .06), 0 8px 24px rgba(20, 26, 35, .12);
+  --display: "Overpass", "Highway Gothic", system-ui, -apple-system, "Segoe UI", sans-serif;
   --body: "Overpass", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "Overpass Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --mono: "Overpass Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111613; --panel: #1a211d; --ink: #e8eee9; --muted: #9aa69f; --line: #2c3631;
-    --sign: #2f8a63; --sign-ink: #ffffff; --google: #5c9cf0; --apple: #f0738a;
-    --good: #4cc27f; --warn: #e0a25a; --map-bg: #1f2622; color-scheme: dark;
+    --bg: #0f1318; --panel: #171c23; --ink: #e9edf2; --muted: #9aa5b3; --line: #262e38; --soft: #1e252e;
+    --accent: #6e8ff7; --accent-ink: #0b1020; --accent-soft: #1d2747; --toll: #f0b257; --toll-soft: #3a2a12;
+    --ok: #5cc98d; --ok-soft: #153325; --alt-route: #5b6676;
+    --land: #1b2026; --water: #0f2a40; --park: #1d3024; --aero: #23242c; --road-minor: #2b323b; --road-mid: #343c46;
+    --road-major: #5a4c33; --road-hwy: #8a6236; --road-case: #12161b; --label: #8d97a3;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .45);
+    color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111613; --panel: #1a211d; --ink: #e8eee9; --muted: #9aa69f; --line: #2c3631;
-  --sign: #2f8a63; --sign-ink: #ffffff; --google: #5c9cf0; --apple: #f0738a;
-  --good: #4cc27f; --warn: #e0a25a; --map-bg: #1f2622; color-scheme: dark;
+  --bg: #0f1318; --panel: #171c23; --ink: #e9edf2; --muted: #9aa5b3; --line: #262e38; --soft: #1e252e;
+  --accent: #6e8ff7; --accent-ink: #0b1020; --accent-soft: #1d2747; --toll: #f0b257; --toll-soft: #3a2a12;
+  --ok: #5cc98d; --ok-soft: #153325; --alt-route: #5b6676;
+  --land: #1b2026; --water: #0f2a40; --park: #1d3024; --aero: #23242c; --road-minor: #2b323b; --road-mid: #343c46;
+  --road-major: #5a4c33; --road-hwy: #8a6236; --road-case: #12161b; --label: #8d97a3;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .45);
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body {
-  margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body);
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 16px 32px;
-}
-.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 16px; }
-header.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
-.brand { display: flex; align-items: center; gap: 10px; }
-.shield {
-  display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 8px;
-  background: var(--sign); color: var(--sign-ink); font: 800 15px/1 var(--display); letter-spacing: .02em;
-  border: 2px solid var(--sign-ink); outline: 2px solid var(--sign);
-}
-h1 { margin: 0; font: 800 22px/1.1 var(--display); letter-spacing: .01em; text-wrap: balance; }
-.sub { margin: 0; color: var(--muted); font-size: 13px; }
-.status { display: flex; gap: 8px; flex-wrap: wrap; font: 600 12px/1 var(--mono); }
-.pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
-.pill.on .dot { background: var(--good); }
-.pill.off .dot { background: var(--warn); }
-button.linkish { background: none; border: 0; color: var(--sign); font: 600 13px var(--body); cursor: pointer; padding: 6px 4px; text-decoration: underline; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 var(--body); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
-form.trip {
-  display: grid; grid-template-columns: 1fr auto 1fr auto auto; gap: 10px; align-items: end;
-  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+.app { position: relative; height: 100%; min-height: 560px; overflow: hidden; }
+#map { position: absolute; inset: 0; background: var(--land); }
+.leaflet-container { font-family: var(--body); background: var(--land); }
+.leaflet-control-attribution { font-size: 10px; }
+/* Soften the standard map tiles so the route stands out; darken them in dark mode. */
+.osm-tiles { filter: saturate(.75) contrast(.95) brightness(1.03); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .osm-tiles { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.5); } }
+:root[data-theme="dark"] .osm-tiles { filter: invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.5); }
+.leaflet-bar a { background: var(--panel); color: var(--ink); border-color: var(--line); }
+
+/* ---- route panel */
+.sheet {
+  position: absolute; z-index: 600; top: 16px; left: 16px; bottom: 16px; width: 392px;
+  display: flex; flex-direction: column; background: var(--panel); border-radius: 16px; box-shadow: var(--shadow);
+  overflow: hidden;
 }
-label { display: grid; gap: 4px; font: 600 11px/1 var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); min-width: 0; }
-input[type="text"], input[type="password"] {
-  width: 100%; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg);
-  color: var(--ink); font: 400 15px var(--body); text-transform: none; letter-spacing: 0;
+.sheet-scroll { overflow-y: auto; display: grid; gap: 14px; padding: 16px; align-content: start; flex: 1; }
+.brand { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.brand h1 { margin: 0; font: 800 17px/1 var(--display); letter-spacing: .01em; display: flex; align-items: center; gap: 8px; }
+.logo { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); display: grid; place-items: center; }
+.logo svg { width: 16px; height: 16px; }
+.iconbtn { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); cursor: pointer; display: grid; place-items: center; color: var(--muted); }
+.iconbtn svg { width: 18px; height: 18px; }
+
+.trip { display: grid; gap: 10px; }
+.stops { position: relative; display: grid; gap: 6px; background: var(--soft); border-radius: 12px; padding: 6px; }
+.stop { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 4px; }
+.stop i { width: 10px; height: 10px; border-radius: 50%; justify-self: center; border: 2.5px solid var(--accent); }
+.stop + .stop i { border-radius: 2px; background: var(--ink); border-color: var(--ink); }
+.stop input {
+  width: 100%; border: 0; background: var(--panel); border-radius: 8px; padding: 10px 40px 10px 10px;
+  font: 400 15px var(--body); color: var(--ink);
 }
-input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--sign); outline-offset: 2px; }
-.swap { height: 44px; width: 44px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; font-size: 18px; }
-.modes { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; height: 44px; }
-.modes button { border: 0; background: var(--bg); color: var(--muted); padding: 0 12px; font: 600 13px var(--body); cursor: pointer; }
-.modes button[aria-pressed="true"] { background: var(--sign); color: var(--sign-ink); }
-.go { height: 44px; padding: 0 20px; border-radius: 8px; border: 0; background: var(--sign); color: var(--sign-ink); font: 800 15px var(--display); letter-spacing: .03em; cursor: pointer; }
+.stop input::placeholder { color: var(--muted); }
+.swap { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); cursor: pointer; color: var(--muted); display: grid; place-items: center; }
+.swap svg { width: 16px; height: 16px; }
+.modes { display: inline-flex; padding: 3px; background: var(--soft); border-radius: 10px; }
+.modes button { border: 0; background: none; padding: 7px 14px; border-radius: 8px; cursor: pointer; font: 600 13px var(--body); color: var(--muted); }
+.modes button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.switches { display: flex; gap: 8px; flex-wrap: wrap; }
+.switch { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px 7px 8px; border-radius: 999px; border: 1px solid var(--line); cursor: pointer; font: 600 13px var(--body); user-select: none; }
+.switch input { position: absolute; opacity: 0; pointer-events: none; }
+.switch .track { width: 30px; height: 18px; border-radius: 9px; background: var(--line); position: relative; transition: background .15s; flex: none; }
+.switch .track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.switch input:checked + .track { background: var(--accent); }
+.switch input:checked + .track::after { transform: translateX(12px); }
+.switch input:focus-visible + .track { outline: 3px solid var(--accent); outline-offset: 2px; }
+.switch.disabled { opacity: .45; cursor: not-allowed; }
+.go { border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); padding: 11px 16px; font: 800 15px var(--display); letter-spacing: .02em; cursor: pointer; }
 .go:disabled { opacity: .6; cursor: progress; }
 
-.verdict {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
-  background: var(--sign); color: var(--sign-ink); border-radius: 12px; padding: 14px 18px;
+.divider { height: 1px; background: var(--line); margin: 0 -16px; }
+#result { display: grid; gap: 14px; }
+.best { display: grid; gap: 10px; }
+.eyebrow { font: 700 11px/1 var(--body); letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.eta { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.eta b { font: 800 40px/1 var(--display); font-variant-numeric: tabular-nums; letter-spacing: -.01em; color: var(--ok); }
+.eta span { color: var(--muted); font: 500 13px var(--mono); }
+.via { font: 600 15px var(--body); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 999px; font: 700 12px var(--body); background: var(--soft); color: var(--muted); white-space: nowrap; }
+.chip.toll { background: var(--toll-soft); color: var(--toll); }
+.chip.free { background: var(--ok-soft); color: var(--ok); }
+.chip svg { width: 13px; height: 13px; }
+.start { width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; padding: 13px; font-size: 16px; }
+.start svg { width: 18px; height: 18px; }
+
+.routes { display: grid; gap: 6px; }
+.rt {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; text-align: left;
+  border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 10px 12px; cursor: pointer;
 }
-.verdict strong { font: 800 20px/1.2 var(--display); }
-.verdict span { font-size: 13px; opacity: .9; }
-.verdict .tag { font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; padding: 5px 8px; border: 1px solid currentColor; border-radius: 6px; }
+.rt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.rt .t { font: 800 18px/1 var(--display); font-variant-numeric: tabular-nums; }
+.rt .d { font: 500 12px var(--mono); color: var(--muted); grid-column: 1; }
+.rt .v { grid-column: 2; grid-row: 1 / span 2; font-size: 14px; overflow-wrap: anywhere; }
+.rt .c { grid-column: 3; grid-row: 1 / span 2; }
 
-.main { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 16px; align-items: start; }
-.providers { display: grid; gap: 12px; min-width: 0; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; min-width: 0; }
-.card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
-.card-head h2 { margin: 0; font: 800 16px/1 var(--display); display: flex; align-items: center; gap: 8px; }
-.swatch { width: 18px; height: 5px; border-radius: 3px; }
-.card[data-p="google"] .swatch { background: var(--google); }
-.card[data-p="apple"] .swatch { background: var(--apple); }
-.badge { font: 600 11px/1 var(--mono); padding: 4px 7px; border-radius: 5px; background: var(--good); color: #fff; }
-.card-body { padding: 14px; display: grid; gap: 12px; }
-.eta { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-.eta b { font: 800 34px/1 var(--display); font-variant-numeric: tabular-nums; }
-.eta .meta { color: var(--muted); font: 400 13px var(--mono); font-variant-numeric: tabular-nums; }
-.alts { display: grid; gap: 6px; }
-.alt {
-  display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); text-align: left; cursor: pointer; font: 400 14px var(--body);
-}
-.alt[aria-pressed="true"] { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
-.card[data-p="google"] .alt[aria-pressed="true"] { color: var(--google); }
-.card[data-p="apple"] .alt[aria-pressed="true"] { color: var(--apple); }
-.alt .n { font: 600 13px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.alt .nm { color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
-details { border-top: 1px dashed var(--line); padding-top: 8px; }
-summary { cursor: pointer; font: 600 13px var(--body); color: var(--muted); }
-ol.steps { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
-ol.steps .d { color: var(--muted); font: 400 12px var(--mono); margin-left: 6px; }
-.err { color: var(--warn); font-size: 14px; margin: 0; overflow-wrap: anywhere; }
+details.steps summary { cursor: pointer; font: 600 14px var(--body); color: var(--muted); padding: 2px 0; }
+details.steps ol { margin: 10px 0 0; padding: 0; list-style: none; display: grid; }
+details.steps li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+details.steps li svg { width: 20px; height: 20px; color: var(--muted); }
+details.steps li .sd { font: 500 12px var(--mono); color: var(--muted); white-space: nowrap; }
+.note { margin: 0; font-size: 13px; color: var(--muted); }
+.note.warn { color: var(--toll); }
+.foot { padding: 10px 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.src { display: inline-flex; gap: 10px; }
+.src span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; background: var(--muted); vertical-align: 1px; }
+.src span.on::before { background: var(--ok); }
+.src span.off::before { background: var(--toll); }
+.empty { color: var(--muted); font-size: 14px; margin: 0; }
+.err { color: var(--toll); font-size: 14px; margin: 0; overflow-wrap: anywhere; }
 
-.mapbox { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); min-width: 0; }
-#map { height: min(72vh, 640px); min-height: 340px; border-radius: 12px; border: 1px solid var(--line); background: var(--map-bg); }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font: 400 12px var(--mono); color: var(--muted); }
-.legend i { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
-.leaflet-container { font-family: var(--body); background: var(--map-bg); }
+/* ---- map details */
+.nb-label { font: 700 10px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--label); white-space: nowrap; text-shadow: 0 0 3px var(--land), 0 0 3px var(--land), 0 0 3px var(--land); pointer-events: none; }
+.nb-label span { display: inline-block; transform: translate(-50%, -50%); }
+.pin svg { width: 30px; height: 38px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+.me svg { width: 34px; height: 34px; transition: transform .4s; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+.map-note { position: absolute; z-index: 500; right: 12px; top: 12px; background: var(--panel); color: var(--muted); border-radius: 8px; padding: 6px 10px; font-size: 12px; box-shadow: var(--shadow); max-width: 280px; }
 
-dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); max-width: 560px; width: calc(100% - 32px); padding: 0; }
-dialog::backdrop { background: rgba(0,0,0,.45); }
-.dlg { padding: 18px; display: grid; gap: 14px; }
-.dlg h3 { margin: 0; font: 800 18px var(--display); }
-.dlg p { margin: 0; font-size: 14px; color: var(--muted); }
-.dlg .row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
-.dlg .ghost { height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 600 14px var(--body); cursor: pointer; }
-.dlg a { color: var(--sign); }
-
-/* ---- navigation mode */
-.navbtn {
-  display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 11px 14px; border-radius: 8px; border: 0;
-  font: 800 15px var(--display); color: #fff; cursor: pointer; letter-spacing: .02em;
-}
-.card[data-p="google"] .navbtn { background: var(--google); }
-.card[data-p="apple"] .navbtn { background: var(--apple); }
-.verdict .navbtn { background: var(--sign-ink); color: var(--sign); }
-.info { margin: 0; font-size: 13px; color: var(--warn); }
+/* ---- navigation */
 .nav-only { display: none; }
 body.navigating .browse-only { display: none !important; }
 body.navigating .nav-only { display: grid; }
-body.navigating .main { grid-template-columns: minmax(0, 1fr); }
-body.navigating .mapbox { position: static; }
-body.navigating #map { height: calc(100vh - 290px); min-height: 260px; }
 .turn {
+  position: absolute; z-index: 700; top: 16px; left: 50%; transform: translateX(-50%); width: min(560px, calc(100% - 32px));
   grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center;
-  background: var(--sign); color: var(--sign-ink); border-radius: 12px; padding: 14px 16px;
+  background: var(--accent); color: var(--accent-ink); border-radius: 16px; padding: 14px 18px; box-shadow: var(--shadow);
 }
-.turn svg { width: 64px; height: 64px; }
+#turn-icon svg { width: 56px; height: 56px; display: block; }
 .turn .dist { font: 800 30px/1 var(--display); font-variant-numeric: tabular-nums; }
-.turn .instr { font: 600 19px/1.25 var(--display); overflow-wrap: anywhere; }
-.turn .then { display: flex; gap: 8px; align-items: center; font-size: 13px; opacity: .9; margin-top: 6px; }
-.turn .then svg { width: 18px; height: 18px; }
-.turn.off { background: var(--warn); }
+.turn .instr { font: 700 19px/1.25 var(--display); overflow-wrap: anywhere; margin-top: 2px; }
+.turn .then { display: flex; gap: 6px; align-items: center; font-size: 13px; opacity: .85; margin-top: 8px; }
+.turn .then svg { width: 16px; height: 16px; flex: none; }
+.turn.off { background: var(--toll); color: #fff; }
 .tripbar {
+  position: absolute; z-index: 700; bottom: 16px; left: 50%; transform: translateX(-50%); width: min(560px, calc(100% - 32px));
   grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; align-items: center;
-  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+  background: var(--panel); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow);
 }
-.tripbar .big { font: 800 26px/1 var(--display); font-variant-numeric: tabular-nums; }
-.tripbar .meta { color: var(--muted); font: 400 13px var(--mono); font-variant-numeric: tabular-nums; }
-.tripbar .street { font: 600 14px var(--body); overflow-wrap: anywhere; }
-.navctl { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.navctl button {
-  height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
-  font: 600 13px var(--body); cursor: pointer;
-}
-.navctl button.end { background: var(--warn); color: #fff; border-color: transparent; }
-.navctl button[aria-pressed="true"] { background: var(--sign); color: var(--sign-ink); border-color: transparent; }
-.steplist { grid-column: 1 / -1; margin: 0; padding-left: 22px; max-height: 30vh; overflow: auto; display: grid; gap: 4px; font-size: 14px; }
-.steplist li.now { font-weight: 800; color: var(--sign); }
-.steplist li.done { color: var(--muted); text-decoration: line-through; }
-.me { width: 30px; height: 30px; }
-.me svg { width: 30px; height: 30px; transition: transform .4s; filter: drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
-.recenter { position: absolute; right: 12px; bottom: 30px; z-index: 500; }
-.mapbox { position: sticky; }
-body.navigating .mapbox { position: relative; }
+.tripbar .big { font: 800 28px/1 var(--display); font-variant-numeric: tabular-nums; color: var(--ok); }
+.tripbar .meta { color: var(--muted); font: 500 13px var(--mono); }
+.tripbar .street { font: 600 14px var(--body); overflow-wrap: anywhere; margin-top: 4px; }
+.navctl { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.navctl button { height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--soft); font: 700 13px var(--body); cursor: pointer; }
+.navctl button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.navctl .end { background: #d64545; border-color: transparent; color: #fff; }
+.tripbar .source { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
+.steplist { grid-column: 1 / -1; margin: 0; padding: 0 0 0 20px; max-height: 28vh; overflow: auto; display: grid; gap: 4px; font-size: 14px; }
+.steplist li.now { font-weight: 800; color: var(--accent); }
+.steplist li.done { color: var(--muted); }
+.recenter { position: absolute; z-index: 700; right: 16px; bottom: 190px; }
+.recenter button { border: 0; border-radius: 999px; background: var(--panel); box-shadow: var(--shadow); padding: 10px 14px; font: 700 13px var(--body); cursor: pointer; }
 
-@media (max-width: 900px) {
-  .main { grid-template-columns: minmax(0, 1fr); }
-  .mapbox { position: static; order: -1; }
-  #map { height: 46vh; }
-}
-@media (max-width: 640px) {
-  .tripbar { grid-template-columns: minmax(0, 1fr); }
-  .navctl { justify-content: flex-start; }
-  .turn svg { width: 48px; height: 48px; }
+dialog { border: 0; border-radius: 16px; background: var(--panel); color: var(--ink); max-width: 520px; width: calc(100% - 32px); padding: 0; box-shadow: var(--shadow); }
+dialog::backdrop { background: rgba(0,0,0,.45); }
+.dlg { padding: 20px; display: grid; gap: 14px; }
+.dlg h3 { margin: 0; font: 800 18px var(--display); }
+.dlg p { margin: 0; font-size: 14px; color: var(--muted); }
+.dlg label { display: grid; gap: 6px; font: 600 13px var(--body); }
+.dlg input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--soft); color: var(--ink); font: 400 14px var(--mono); }
+.dlg a { color: var(--accent); }
+.dlg .acts { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.ghost { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 10px 14px; font: 700 14px var(--body); cursor: pointer; }
+
+@media (max-width: 760px) {
+  .app { height: auto; min-height: 0; overflow: visible; }
+  #map { position: relative; height: 46vh; min-height: 300px; }
+  .sheet { position: relative; inset: auto; width: auto; margin: -18px 0 0; border-radius: 18px 18px 0 0; box-shadow: none; }
+  .sheet-scroll { padding: 18px max(16px, env(safe-area-inset-right, 0px)) 18px max(16px, env(safe-area-inset-left, 0px)); overflow: visible; }
+  .foot { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .map-note { left: 12px; right: 12px; top: 12px; max-width: none; }
+  body.navigating .app { height: 100%; overflow: hidden; }
+  body.navigating #map { position: absolute; height: auto; min-height: 0; }
+  .turn { top: 12px; width: calc(100% - 24px); padding: 12px 14px; }
+  #turn-icon svg { width: 44px; height: 44px; }
   .turn .dist { font-size: 26px; }
   .turn .instr { font-size: 17px; }
-  body.navigating #map { height: calc(100vh - 380px); }
-  form.trip { grid-template-columns: minmax(0, 1fr) auto; }
-  form.trip label:nth-of-type(2) { grid-column: 1 / 2; }
-  .swap { grid-column: 2; grid-row: 1; align-self: end; }
-  .modes { grid-column: 1 / -1; }
-  .modes button { flex: 1; }
-  .go { grid-column: 1 / -1; }
+  .tripbar { bottom: 12px; width: calc(100% - 24px); grid-template-columns: minmax(0, 1fr); }
+  .navctl { justify-content: flex-start; }
+  .recenter { bottom: 230px; right: 12px; }
+  body.navigating .leaflet-control-zoom { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 
-<div class="wrap">
-  <header class="bar browse-only">
-    <div class="brand">
-      <span class="shield" aria-hidden="true">G·A</span>
-      <div>
-        <h1>Two-Map Navigator</h1>
-        <p class="sub">Routes from Google Maps and Apple Maps, compared on one map.</p>
+<div class="app">
+  <div id="map" role="application" aria-label="Map"></div>
+  <div class="map-note browse-only" id="map-note" hidden></div>
+
+  <aside class="sheet browse-only" aria-label="Route planner">
+    <div class="sheet-scroll">
+      <div class="brand">
+        <h1><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 18-7-4-7 4z"/></svg></span>Two-Map Navigator</h1>
+        <button class="iconbtn" type="button" id="open-keys" aria-label="Live data keys" title="Live data keys"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 7l3 3M14 9l2 2"/></svg></button>
       </div>
-    </div>
-    <div class="status">
-      <span class="pill" id="st-google"><span class="dot"></span>Google</span>
-      <span class="pill" id="st-apple"><span class="dot"></span>Apple</span>
-      <button class="linkish" type="button" id="open-keys">API keys</button>
-    </div>
-  </header>
 
-  <form class="trip browse-only" id="trip" autocomplete="on">
-    <label for="origin">From
-      <input type="text" id="origin" name="origin" placeholder="Address, place, or lat,lng" required>
-    </label>
-    <button class="swap" type="button" id="swap" aria-label="Swap start and destination">⇄</button>
-    <label for="destination">To
-      <input type="text" id="destination" name="destination" placeholder="Where are you going?" required>
-    </label>
-    <div class="modes" role="group" aria-label="Travel mode">
-      <button type="button" data-mode="drive" aria-pressed="true">Drive</button>
-      <button type="button" data-mode="walk" aria-pressed="false">Walk</button>
-      <button type="button" data-mode="bike" aria-pressed="false">Bike</button>
-    </div>
-    <button class="go" type="submit" id="go">Compare routes</button>
-  </form>
+      <form class="trip" id="trip" autocomplete="on">
+        <div class="stops">
+          <label class="stop" for="origin"><i aria-hidden="true"></i><input type="text" id="origin" name="origin" placeholder="Start: address, place, or lat,lng" aria-label="Start" required></label>
+          <label class="stop" for="destination"><i aria-hidden="true"></i><input type="text" id="destination" name="destination" placeholder="Where to?" aria-label="Destination" required></label>
+          <button class="swap" type="button" id="swap" aria-label="Swap start and destination"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M20 16l-4 4-4-4"/></svg></button>
+        </div>
+        <div class="modes" role="group" aria-label="Travel mode">
+          <button type="button" data-mode="drive" aria-pressed="true">Drive</button>
+          <button type="button" data-mode="walk" aria-pressed="false">Walk</button>
+          <button type="button" data-mode="bike" aria-pressed="false">Bike</button>
+        </div>
+        <div class="switches" role="group" aria-label="Route options">
+          <label class="switch" for="opt-tolls"><input type="checkbox" id="opt-tolls"><span class="track"></span>Avoid tolls</label>
+          <label class="switch" for="opt-highways"><input type="checkbox" id="opt-highways"><span class="track"></span>Avoid highways</label>
+        </div>
+        <button class="go" type="submit" id="go">Find route</button>
+      </form>
 
-  <section class="verdict browse-only" id="verdict" aria-live="polite">
-    <div><strong id="v-title">Loading sample trip…</strong><br><span id="v-sub"></span></div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="tag" id="v-tag">Sample data</span><button type="button" class="navbtn" id="nav-best">Start navigation</button></div>
-  </section>
+      <div class="divider"></div>
+      <section id="result" aria-live="polite"><p class="empty">Loading the sample trip…</p></section>
+    </div>
+    <div class="foot">
+      <span id="foot-text">Checks Google Maps and Apple Maps, then picks the fastest.</span>
+      <span class="src"><span id="src-google">Google</span><span id="src-apple">Apple</span></span>
+    </div>
+  </aside>
 
   <section class="turn nav-only" id="turn" aria-live="polite">
     <div id="turn-icon"></div>
@@ -246,565 +278,42 @@ body.navigating .mapbox { position: relative; }
       <div class="then" id="turn-then"></div>
     </div>
   </section>
-
-  <div class="main">
-    <div class="providers browse-only">
-      <article class="card" data-p="google" id="card-google"></article>
-      <article class="card" data-p="apple" id="card-apple"></article>
+  <div class="recenter nav-only" id="recenter" hidden><button type="button" id="recenter-btn">Re-center</button></div>
+  <section class="tripbar nav-only" id="tripbar">
+    <div>
+      <div><span class="big" id="nav-left">–</span> <span class="meta" id="nav-meta"></span></div>
+      <div class="street" id="nav-street"></div>
     </div>
-    <div class="mapbox">
-      <div id="map" role="img" aria-label="Map showing the Google and Apple routes"></div>
-      <button type="button" class="recenter navctl nav-only" id="recenter" hidden><span style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:600 13px var(--body);color:var(--ink)">Re-center</span></button>
-      <div class="legend browse-only"><span><i style="background:var(--google)"></i>Google Maps</span><span><i style="background:var(--apple)"></i>Apple Maps</span><span>Thin lines are alternatives</span></div>
+    <div class="navctl">
+      <button type="button" id="nav-steps" aria-pressed="false">Steps</button>
+      <button type="button" id="nav-voice" aria-pressed="true">Voice on</button>
+      <button type="button" id="nav-pos">Use GPS</button>
+      <button type="button" id="nav-speed" hidden>Speed 4×</button>
+      <button type="button" class="end" id="nav-end">End</button>
     </div>
-  </div>
+    <ol class="steplist" id="nav-steplist" hidden></ol>
+    <div class="source" id="nav-source"></div>
+  </section>
 </div>
-
-<section class="tripbar nav-only wrap" id="tripbar" style="margin-top:12px">
-  <div>
-    <div><span class="big" id="nav-left">–</span> <span class="meta" id="nav-meta"></span></div>
-    <div class="street" id="nav-street"></div>
-    <div class="meta" id="nav-source"></div>
-  </div>
-  <div class="navctl">
-    <button type="button" id="nav-steps" aria-pressed="false">Steps</button>
-    <button type="button" id="nav-voice" aria-pressed="true">Voice on</button>
-    <button type="button" id="nav-pos">Use GPS</button>
-    <button type="button" id="nav-speed" hidden>Speed 4×</button>
-    <button type="button" class="end" id="nav-end">End</button>
-  </div>
-  <ol class="steplist" id="nav-steplist" hidden></ol>
-</section>
 
 <dialog id="keys">
   <form class="dlg" method="dialog" id="keys-form">
-    <h3>API keys</h3>
+    <h3>Live route data</h3>
     <p id="keys-mode-note"></p>
     <label for="k-google">Google Maps API key (Routes API enabled)
       <input type="password" id="k-google" placeholder="AIza…" autocomplete="off">
     </label>
-    <label for="k-apple">Apple Maps token (MapKit JS / Maps token, a JWT)
+    <label for="k-apple">Apple Maps token (a signed JWT)
       <input type="password" id="k-apple" placeholder="eyJ…" autocomplete="off">
     </label>
-    <p>Keys you paste here stay in this browser only. How to get them: <a href="https://developers.google.com/maps/documentation/routes/get-api-key" target="_blank" rel="noopener">Google key</a> · <a href="https://developer.apple.com/documentation/applemapsserverapi/creating-a-maps-token" target="_blank" rel="noopener">Apple token</a>.</p>
-    <div class="row">
+    <p>Keys you paste here stay in this browser. How to get them: <a href="https://developers.google.com/maps/documentation/routes/get-api-key" target="_blank" rel="noopener">Google key</a> · <a href="https://developer.apple.com/documentation/applemapsserverapi/creating-a-maps-token" target="_blank" rel="noopener">Apple token</a>.</p>
+    <div class="acts">
       <button class="ghost" type="button" id="k-clear">Clear keys</button>
       <button class="ghost" type="button" id="k-demo">Show sample trip</button>
-      <button class="go" type="submit" id="k-save">Save</button>
+      <button class="go" type="submit">Save</button>
     </div>
   </form>
 </dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script type="module">
-import { fetchGoogleRoutes, fetchAppleRoutes, demoRoutes } from "./providers.js";
-import { createTracker, pointAt } from "./nav.js";
-
-const $ = (s) => document.querySelector(s);
-const state = { mode: "drive", server: null, result: null, selected: { google: 0, apple: 0 } };
-const store = {
-  get(k) { try { return localStorage.getItem(k) || ""; } catch { return ""; } },
-  set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} },
-};
-
-// ---- formatting
-const fmtDur = (s) => {
-  const m = Math.round(s / 60);
-  if (m < 60) return `${m} min`;
-  return `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")} min`;
-};
-const fmtDist = (m) => (m >= 1000 ? `${(m / 1000).toFixed(m >= 10000 ? 0 : 1)} km` : `${Math.round(m)} m`);
-const fmtMi = (m) => `${(m / 1609.344).toFixed(1)} mi`;
-const arrive = (s) => new Date(Date.now() + s * 1000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
-// ---- map
-let map = null, layers = null;
-function initMap() {
-  if (!window.L) return;
-  map = L.map("map", { zoomControl: true, attributionControl: true }).setView([37.78, -122.43], 12);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19, attribution: "Map tiles &copy; OpenStreetMap contributors",
-  }).addTo(map);
-  layers = L.layerGroup().addTo(map);
-}
-function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
-function drawMap() {
-  if (!map || !state.result) return;
-  layers.clearLayers();
-  const bounds = [];
-  for (const p of ["google", "apple"]) {
-    const r = state.result[p];
-    if (!r?.ok) continue;
-    const color = cssVar(p === "google" ? "--google" : "--apple");
-    r.routes.forEach((route, i) => {
-      if (!route.path.length) return;
-      const sel = i === state.selected[p];
-      const line = L.polyline(route.path, {
-        color, weight: sel ? 6 : 3, opacity: sel ? 0.9 : 0.45, dashArray: sel ? null : "6 8",
-        offset: 0,
-      }).bindTooltip(`${p === "google" ? "Google" : "Apple"}: ${fmtDur(route.durationSec)} · ${esc(route.name)}`);
-      line.on("click", () => selectRoute(p, i));
-      line.addTo(layers);
-      if (sel) line.bringToFront();
-      bounds.push(...route.path);
-    });
-  }
-  if (bounds.length) {
-    const ink = cssVar("--ink");
-    L.circleMarker(bounds[0], { radius: 7, color: ink, fillColor: cssVar("--panel"), fillOpacity: 1, weight: 3 }).bindTooltip("Start").addTo(layers);
-    const last = state.result.google?.ok ? state.result.google.routes[0].path.at(-1) : bounds.at(-1);
-    L.circleMarker(last, { radius: 7, color: ink, fillColor: ink, fillOpacity: 1, weight: 3 }).bindTooltip("Destination").addTo(layers);
-    map.fitBounds(L.latLngBounds(bounds), { padding: [30, 30] });
-  }
-}
-
-// ---- rendering
-function renderCard(p) {
-  const el = $(`#card-${p}`);
-  const name = p === "google" ? "Google Maps" : "Apple Maps";
-  const r = state.result?.[p];
-  const fastest = fastestProvider();
-  let body;
-  if (!r) {
-    body = `<p class="err">No result yet.</p>`;
-  } else if (!r.ok) {
-    body = `<p class="err">${esc(r.error)}</p>`;
-  } else {
-    const route = r.routes[state.selected[p]] || r.routes[0];
-    body = `
-      <div class="eta"><b>${fmtDur(route.durationSec)}</b>
-        <span class="meta">${fmtDist(route.distanceM)} · ${fmtMi(route.distanceM)}<br>arrive ~${arrive(route.durationSec)}</span></div>
-      <div class="alts">${r.routes.map((rt, i) => `
-        <button type="button" class="alt" data-p="${p}" data-i="${i}" aria-pressed="${i === state.selected[p]}">
-          <span class="nm">${esc(rt.name)}</span><span class="n">${fmtDur(rt.durationSec)} · ${fmtDist(rt.distanceM)}</span>
-        </button>`).join("")}</div>
-      ${route.trafficDelaySec >= 60 ? `<p class="info">Includes ${fmtDur(route.trafficDelaySec)} of traffic delay</p>` : ""}
-      ${(route.warnings || []).map((w) => `<p class="info">${esc(w)}</p>`).join("")}
-      ${route.steps.length ? `<details><summary>${route.steps.length} turn-by-turn steps</summary>
-        <ol class="steps">${route.steps.map((s) => `<li>${esc(s.instruction)}<span class="d">${fmtDist(s.distanceM)}</span></li>`).join("")}</ol></details>` : ""}`;
-  }
-  el.innerHTML = `
-    <div class="card-head"><h2><span class="swatch"></span>${name}</h2>${fastest === p ? `<span class="badge">FASTEST</span>` : ""}</div>
-    <div class="card-body">${body}
-      ${r?.ok ? `<button type="button" class="navbtn" data-nav="${p}">Navigate with ${name} route</button>` : ""}
-    </div>`;
-}
-function fastestProvider() {
-  const g = state.result?.google, a = state.result?.apple;
-  if (!g?.ok || !a?.ok) return g?.ok ? "google" : a?.ok ? "apple" : null;
-  const gs = Math.min(...g.routes.map((r) => r.durationSec));
-  const as = Math.min(...a.routes.map((r) => r.durationSec));
-  if (Math.abs(gs - as) < 30) return null;
-  return gs < as ? "google" : "apple";
-}
-function renderVerdict() {
-  const g = state.result?.google, a = state.result?.apple;
-  const title = $("#v-title"), sub = $("#v-sub"), tag = $("#v-tag");
-  tag.textContent = state.result?.demo ? "Sample data" : "Live";
-  $("#nav-best").hidden = !(g?.ok || a?.ok);
-  if (!g?.ok && !a?.ok) {
-    title.textContent = "No routes yet";
-    sub.textContent = "Neither service answered. Check the messages below each card.";
-    return;
-  }
-  if (!g?.ok || !a?.ok) {
-    const ok = g?.ok ? "Google Maps" : "Apple Maps";
-    const best = (g?.ok ? g : a).routes[0];
-    title.textContent = `${ok}: ${fmtDur(best.durationSec)}, ${fmtDist(best.distanceM)}`;
-    sub.textContent = `Only ${ok} returned a route, so there's nothing to compare yet.`;
-    return;
-  }
-  const gb = g.routes.reduce((x, y) => (y.durationSec < x.durationSec ? y : x));
-  const ab = a.routes.reduce((x, y) => (y.durationSec < x.durationSec ? y : x));
-  const diff = Math.abs(gb.durationSec - ab.durationSec);
-  const both = `Google ${fmtDur(gb.durationSec)} ${gb.name} · Apple ${fmtDur(ab.durationSec)} ${ab.name}`;
-  if (diff < 30) {
-    title.textContent = `Both say about ${fmtDur(gb.durationSec)}`;
-  } else {
-    const winner = gb.durationSec < ab.durationSec ? "Google Maps" : "Apple Maps";
-    title.textContent = `${winner} is ${fmtDur(diff)} faster`;
-  }
-  sub.textContent = `${both}${state.result.demo ? " (illustrative times, not live)" : ""}`;
-}
-function render() {
-  renderVerdict();
-  renderCard("google");
-  renderCard("apple");
-  drawMap();
-}
-function selectRoute(p, i) {
-  state.selected[p] = i;
-  render();
-}
-document.addEventListener("click", (e) => {
-  const b = e.target.closest(".alt");
-  if (b) selectRoute(b.dataset.p, Number(b.dataset.i));
-});
-
-// ---- data
-async function settle(promise) {
-  try { return { ok: true, ...(await promise) }; } catch (err) { return { ok: false, error: friendly(err) }; }
-}
-function friendly(err) {
-  const msg = err?.message || String(err);
-  if (/Failed to fetch|NetworkError|Load failed/i.test(msg)) {
-    return "Couldn't reach the service from this page. Pages hosted on claude.ai can't call outside services, so run the app on your computer (see the README) to get live routes.";
-  }
-  return msg;
-}
-async function lookUp(origin, destination) {
-  const mode = state.mode;
-  if (state.server) {
-    const res = await fetch("api/routes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ origin, destination, mode }) });
-    return res.json();
-  }
-  const gKey = store.get("nav.googleKey"), aTok = store.get("nav.appleToken");
-  const [google, apple] = await Promise.all([
-    gKey ? settle(fetchGoogleRoutes({ apiKey: gKey, origin, destination, mode })) : { ok: false, error: "Add a Google Maps API key (API keys, top right) to get Google routes." },
-    aTok ? settle(fetchAppleRoutes({ authToken: aTok, origin, destination, mode })) : { ok: false, error: "Add an Apple Maps token (API keys, top right) to get Apple routes." },
-  ]);
-  return { origin, destination, mode, google, apple };
-}
-function showDemo() {
-  const d = demoRoutes();
-  $("#origin").value = d.origin;
-  $("#destination").value = d.destination;
-  state.result = { demo: true, origin: d.origin, destination: d.destination, google: { ok: true, ...d.google }, apple: { ok: true, ...d.apple } };
-  state.selected = { google: 0, apple: 0 };
-  render();
-}
-
-$("#trip").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const origin = $("#origin").value.trim(), destination = $("#destination").value.trim();
-  if (!origin || !destination) return;
-  const go = $("#go");
-  go.disabled = true; go.textContent = "Asking both maps…";
-  $("#v-title").textContent = "Asking Google and Apple…";
-  $("#v-sub").textContent = `${origin} → ${destination}`;
-  try {
-    state.result = await lookUp(origin, destination);
-    state.selected = { google: 0, apple: 0 };
-    render();
-  } catch (err) {
-    $("#v-title").textContent = "Something went wrong";
-    $("#v-sub").textContent = friendly(err);
-  } finally {
-    go.disabled = false; go.textContent = "Compare routes";
-  }
-});
-$("#swap").addEventListener("click", () => {
-  const o = $("#origin"), d = $("#destination");
-  [o.value, d.value] = [d.value, o.value];
-});
-document.querySelectorAll(".modes button").forEach((b) =>
-  b.addEventListener("click", () => {
-    state.mode = b.dataset.mode;
-    document.querySelectorAll(".modes button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-  })
-);
-
-// ---- keys dialog and status
-function setPill(p, on, label) {
-  const el = $(`#st-${p}`);
-  el.className = `pill ${on ? "on" : "off"}`;
-  el.lastChild.textContent = label;
-}
-function refreshStatus() {
-  const cfg = state.server || { google: !!store.get("nav.googleKey"), apple: !!store.get("nav.appleToken") };
-  setPill("google", cfg.google, cfg.google ? "Google ready" : "Google: no key");
-  setPill("apple", cfg.apple, cfg.apple ? "Apple ready" : "Apple: no token");
-}
-$("#open-keys").addEventListener("click", () => {
-  $("#keys-mode-note").textContent = state.server
-    ? "This app is running on your own server, which already holds the keys from its .env file. Edit .env and restart to change them; the fields below aren't used."
-    : "Paste your keys to look up live routes straight from this browser. On claude.ai this page can only show the sample trip, since hosted pages can't call outside services.";
-  $("#k-google").value = store.get("nav.googleKey");
-  $("#k-apple").value = store.get("nav.appleToken");
-  $("#keys").showModal();
-});
-$("#keys-form").addEventListener("submit", () => {
-  store.set("nav.googleKey", $("#k-google").value.trim());
-  store.set("nav.appleToken", $("#k-apple").value.trim());
-  refreshStatus();
-});
-$("#k-clear").addEventListener("click", () => {
-  $("#k-google").value = ""; $("#k-apple").value = "";
-  store.set("nav.googleKey", ""); store.set("nav.appleToken", "");
-  refreshStatus();
-});
-$("#k-demo").addEventListener("click", () => { $("#keys").close(); showDemo(); });
-
-// ---- turn-by-turn navigation (runs entirely in this page; Google and Apple only supply the route data)
-const ICONS = {
-  straight: ["M12 20V5", "M6 11l6-6 6 6"],
-  depart: ["M12 20V5", "M6 11l6-6 6 6"],
-  left: ["M17 20v-7a3 3 0 0 0-3-3H6", "M10 6l-4 4 4 4"],
-  right: ["M7 20v-7a3 3 0 0 1 3-3h8", "M14 6l4 4-4 4"],
-  "slight-left": ["M15 20v-6L8 7", "M8 13V7h6"],
-  "slight-right": ["M9 20v-6l7-7", "M10 7h6v6"],
-  "sharp-left": ["M16 4v8L7 18", "M7 12v6h6"],
-  "sharp-right": ["M8 4v8l9 6", "M17 12v6h-6"],
-  uturn: ["M16 20V9a4 4 0 0 0-8 0v5", "M5 11l3 3 3-3"],
-  roundabout: ["M12 21v-7", "M16 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0", "M16 10h4", "M18 8l2 2-2 2"],
-  merge: ["M8 20v-5l4-4V4", "M16 20v-5l-4-4", "M8 8l4-4 4 4"],
-  arrive: ["M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z", "M14 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0"],
-  ferry: ["M3 18c2 1.5 4 1.5 6 0s4-1.5 6 0 4 1.5 6 0", "M5 15l1-5h12l1 5", "M9 10V6h6v4"],
-};
-const icon = (m) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(ICONS[m] || ICONS.straight).map((d) => `<path d="${d}"/>`).join("")}</svg>`;
-const ARROW = `<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="#ffffff"/><circle cx="15" cy="15" r="10" fill="var(--sign)"/><path d="M15 7l6 13-6-3.5-6 3.5z" fill="#ffffff"/></svg>`;
-
-const navState = {
-  on: false, provider: null, route: null, tracker: null, destination: "", source: "sim",
-  simAlong: 0, simTimer: null, watchId: null, speed: 4, voice: store.get("nav.voice") !== "off",
-  follow: true, rerouting: false, layers: null, me: null, lastFix: null, wakeLock: null,
-};
-
-function speak(lines) {
-  if (!navState.voice || !lines.length || !("speechSynthesis" in window)) return;
-  try {
-    speechSynthesis.cancel();
-    for (const t of lines) speechSynthesis.speak(new SpeechSynthesisUtterance(t));
-  } catch {}
-}
-
-function startNavigation(provider) {
-  const r = state.result?.[provider];
-  if (!r?.ok) return;
-  const route = r.routes[state.selected[provider]] || r.routes[0];
-  if (!route.path.length || !route.steps.length) return;
-  Object.assign(navState, {
-    on: true, provider, route, destination: state.result.destination, follow: true, rerouting: false, lastFix: null, lastAlong: 0,
-  });
-  navState.tracker = createTracker(route);
-  document.body.classList.add("navigating");
-  if (map) {
-    map.invalidateSize();
-    layers.clearLayers();
-    navState.layers = L.layerGroup().addTo(map);
-    map.on("dragstart", onDrag);
-  }
-  try { navigator.wakeLock?.request("screen").then((w) => (navState.wakeLock = w)).catch(() => {}); } catch {}
-  renderStepList();
-  setVoiceBtn();
-  // Live GPS when the page is allowed to use it; otherwise a simulated drive along the route.
-  useSource(state.result.demo ? "sim" : "gps");
-  window.scrollTo(0, 0);
-}
-
-function onDrag() {
-  navState.follow = false;
-  $("#recenter").hidden = false;
-}
-$("#recenter").addEventListener("click", () => {
-  navState.follow = true;
-  $("#recenter").hidden = true;
-  if (navState.lastFix) map.setView(navState.lastFix, 17);
-});
-
-function stopPosition() {
-  clearInterval(navState.simTimer);
-  navState.simTimer = null;
-  if (navState.watchId != null) navigator.geolocation?.clearWatch(navState.watchId);
-  navState.watchId = null;
-}
-
-function useSource(source) {
-  stopPosition();
-  navState.source = source;
-  $("#nav-pos").textContent = source === "gps" ? "Simulate drive" : "Use GPS";
-  $("#nav-speed").hidden = source !== "sim";
-  if (source === "gps") {
-    if (!navigator.geolocation) return gpsFailed("This browser has no location access.");
-    $("#turn-instr").textContent = "Finding your location…";
-    navState.watchId = navigator.geolocation.watchPosition(
-      (p) => onFix([p.coords.latitude, p.coords.longitude], p.coords.heading),
-      (e) => gpsFailed(e.code === 1 ? "Location permission was refused." : "Couldn't get your location."),
-      { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 }
-    );
-  } else {
-    const nav = navState.tracker.nav;
-    const mps = nav.total / Math.max(60, nav.durationSec);
-    navState.simAlong = navState.lastAlong || 0; // carry on from where we are
-    const tick = () => {
-      navState.simAlong = Math.min(nav.total, navState.simAlong + mps * navState.speed * 0.5);
-      const pt = pointAt(nav, navState.simAlong);
-      onFix(pt.point, pt.heading);
-      if (navState.simAlong >= nav.total) clearInterval(navState.simTimer);
-    };
-    tick();
-    navState.simTimer = setInterval(tick, 500);
-  }
-}
-
-function gpsFailed(why) {
-  $("#nav-source").textContent = `${why} Showing a simulated drive instead.`;
-  useSource("sim");
-}
-
-function onFix(pos, heading) {
-  if (!navState.on) return;
-  const u = navState.tracker.update(pos);
-  navState.lastAlong = navState.tracker.nav.total - u.remainingM;
-  const prev = navState.lastFix;
-  navState.lastFix = pos;
-  const hdg = Number.isFinite(heading) ? heading : prev ? bearing(prev, pos) : 0;
-  drawNav(u, pos, hdg);
-  renderNav(u);
-  speak(u.announce);
-  if (u.needsReroute && !navState.rerouting && navState.source === "gps") reroute(pos);
-  if (u.arrived) stopPosition();
-}
-
-function bearing(a, b) {
-  const toR = Math.PI / 180;
-  const y = Math.sin((b[1] - a[1]) * toR) * Math.cos(b[0] * toR);
-  const x = Math.cos(a[0] * toR) * Math.sin(b[0] * toR) - Math.sin(a[0] * toR) * Math.cos(b[0] * toR) * Math.cos((b[1] - a[1]) * toR);
-  return (Math.atan2(y, x) / toR + 360) % 360;
-}
-
-function drawNav(u, pos, hdg) {
-  if (!map) return;
-  const nav = navState.tracker.nav;
-  const color = cssVar(navState.provider === "google" ? "--google" : "--apple");
-  const g = navState.layers;
-  g.clearLayers();
-  const along = nav.total - u.remainingM;
-  const split = pointAt(nav, along);
-  const done = nav.path.slice(0, split.segIdx + 1).concat([split.point]);
-  const ahead = [split.point].concat(nav.path.slice(split.segIdx + 1));
-  L.polyline(done, { color: cssVar("--muted"), weight: 6, opacity: 0.6 }).addTo(g);
-  L.polyline(ahead, { color, weight: 8, opacity: 0.9 }).addTo(g);
-  L.circleMarker(nav.path.at(-1), { radius: 8, color: cssVar("--ink"), fillColor: cssVar("--ink"), fillOpacity: 1 }).bindTooltip("Destination").addTo(g);
-  const me = L.marker(u.offBy > 45 ? pos : u.snapped, {
-    icon: L.divIcon({ className: "me", html: ARROW.replace("<svg", `<svg style="transform:rotate(${Math.round(hdg)}deg)"`), iconSize: [30, 30], iconAnchor: [15, 15] }),
-    interactive: false,
-  });
-  me.addTo(g);
-  if (navState.follow) map.setView(u.offBy > 45 ? pos : u.snapped, Math.max(map.getZoom(), 16), { animate: true });
-}
-
-function renderNav(u) {
-  const turn = $("#turn");
-  const off = u.offBy > 45 && !u.arrived;
-  turn.classList.toggle("off", off);
-  if (u.arrived) {
-    $("#turn-icon").innerHTML = icon("arrive");
-    $("#turn-dist").textContent = "Arrived";
-    $("#turn-instr").textContent = navState.destination;
-    $("#turn-then").innerHTML = "";
-  } else if (off) {
-    $("#turn-icon").innerHTML = icon("uturn");
-    $("#turn-dist").textContent = `${fmtDist(u.offBy)} off route`;
-    $("#turn-instr").textContent = navState.rerouting ? `Getting a new route from ${provName()}…` : "Head back to the highlighted line";
-    $("#turn-then").innerHTML = "";
-  } else {
-    $("#turn-icon").innerHTML = icon(u.next ? u.next.maneuver : "arrive");
-    $("#turn-dist").textContent = fmtDist(roundDist(u.toNextM));
-    $("#turn-instr").textContent = u.next ? u.next.instruction : `Arrive at ${navState.destination}`;
-    const after = navState.tracker.nav.steps[u.stepIdx + 2];
-    $("#turn-then").innerHTML = after ? `Then ${icon(after.maneuver)} <span>${esc(after.instruction)}</span>` : u.next ? "Then you arrive" : "";
-  }
-  $("#nav-left").textContent = fmtDur(u.remainingSec);
-  $("#nav-meta").textContent = `${fmtDist(u.remainingM)} · arrive ${arrive(u.remainingSec)}`;
-  const street = u.current?.street;
-  $("#nav-street").textContent = street ? `On ${street}` : "";
-  if (!$("#nav-source").textContent.includes("simulated")) {
-    $("#nav-source").textContent = `Route and street data: ${provName()} · ${navState.source === "gps" ? "live GPS" : `simulated drive at ${navState.speed}×`}`;
-  }
-  document.querySelectorAll("#nav-steplist li").forEach((li, i) => {
-    li.className = i < u.stepIdx ? "done" : i === u.stepIdx ? "now" : "";
-  });
-}
-const roundDist = (m) => (m >= 1000 ? m : m >= 100 ? Math.round(m / 50) * 50 : Math.round(m / 10) * 10);
-const provName = () => (navState.provider === "google" ? "Google Maps" : "Apple Maps");
-
-function renderStepList() {
-  $("#nav-steplist").innerHTML = navState.tracker.nav.steps
-    .map((st) => `<li>${esc(st.instruction)} <span class="meta">${fmtDist(st.distanceM)}</span></li>`)
-    .join("");
-}
-
-async function reroute(pos) {
-  navState.rerouting = true;
-  try {
-    const res = await lookUp(`${pos[0].toFixed(6)},${pos[1].toFixed(6)}`, navState.destination);
-    const order = navState.provider === "google" ? ["google", "apple"] : ["apple", "google"];
-    const p = order.find((k) => res[k]?.ok && res[k].routes[0]?.steps.length);
-    if (p && navState.on) {
-      navState.provider = p;
-      navState.route = res[p].routes[0];
-      navState.tracker = createTracker(navState.route);
-      navState.lastAlong = 0;
-      renderStepList();
-      speak(["Route updated"]);
-    }
-  } catch {}
-  setTimeout(() => (navState.rerouting = false), 8000); // don't ask again for a few seconds
-}
-
-function endNavigation() {
-  stopPosition();
-  navState.on = false;
-  try { speechSynthesis.cancel(); } catch {}
-  try { navState.wakeLock?.release(); } catch {}
-  document.body.classList.remove("navigating");
-  $("#nav-source").textContent = "";
-  $("#recenter").hidden = true;
-  if (map) {
-    map.off("dragstart", onDrag);
-    navState.layers?.remove();
-    map.invalidateSize();
-  }
-  render();
-}
-
-function setVoiceBtn() {
-  const b = $("#nav-voice");
-  b.setAttribute("aria-pressed", String(navState.voice));
-  b.textContent = navState.voice ? "Voice on" : "Voice off";
-}
-$("#nav-voice").addEventListener("click", () => {
-  navState.voice = !navState.voice;
-  store.set("nav.voice", navState.voice ? "" : "off");
-  if (!navState.voice) try { speechSynthesis.cancel(); } catch {}
-  setVoiceBtn();
-});
-$("#nav-pos").addEventListener("click", () => {
-  $("#nav-source").textContent = "";
-  useSource(navState.source === "gps" ? "sim" : "gps");
-});
-$("#nav-speed").addEventListener("click", () => {
-  const speeds = [1, 4, 10];
-  navState.speed = speeds[(speeds.indexOf(navState.speed) + 1) % speeds.length];
-  $("#nav-speed").textContent = `Speed ${navState.speed}×`;
-  $("#nav-source").textContent = "";
-});
-$("#nav-steps").addEventListener("click", () => {
-  const list = $("#nav-steplist");
-  list.hidden = !list.hidden;
-  $("#nav-steps").setAttribute("aria-pressed", String(!list.hidden));
-});
-$("#nav-end").addEventListener("click", endNavigation);
-document.addEventListener("click", (e) => {
-  const b = e.target.closest("[data-nav]");
-  if (b) startNavigation(b.dataset.nav);
-});
-$("#nav-best").addEventListener("click", () => {
-  const p = fastestProvider() || (state.result?.google?.ok ? "google" : "apple");
-  startNavigation(p);
-});
-
-// ---- boot
-async function boot() {
-  initMap();
-  try {
-    const res = await fetch("api/config", { cache: "no-store" });
-    if (res.ok && (res.headers.get("content-type") || "").includes("json")) state.server = await res.json();
-  } catch {}
-  refreshStatus();
-  showDemo();
-}
-boot();
-</script>
+<script type="module" src="./app.js"></script>

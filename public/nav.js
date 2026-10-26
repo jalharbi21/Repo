@@ -97,7 +97,7 @@ export function progress(nav, along) {
 }
 
 // Stateful tracker: feed it positions, it tells you what to show and say.
-export function createTracker(route, { offRouteM = 45, offRouteFixes = 3 } = {}) {
+export function createTracker(route, { offRouteM = 45, offRouteFixes = 3, imperial = false } = {}) {
   const nav = prepareRoute(route);
   let hint = 0, lastStep = -1, strikes = 0, spoken = new Set(), maxAlong = 0, stepStartToNext = 0, justSaid = "";
   return {
@@ -118,9 +118,9 @@ export function createTracker(route, { offRouteM = 45, offRouteFixes = 3 } = {})
         stepStartToNext = p.toNextM;
         const alreadySaid = p.current && p.current.instruction === justSaid;
         if (p.current && !alreadySaid) {
-          announce.push(p.next ? `${p.current.instruction}. Then, in ${speakDist(p.toNextM)}, ${lowerFirst(p.next.instruction)}` : p.current.instruction);
+          announce.push(p.next ? `${p.current.instruction}. Then, in ${speakDist(p.toNextM, imperial)}, ${lowerFirst(p.next.instruction)}` : p.current.instruction);
         } else if (p.next && p.toNextM < 800) {
-          announce.push(`Then, in ${speakDist(p.toNextM)}, ${lowerFirst(p.next.instruction)}`);
+          announce.push(`Then, in ${speakDist(p.toNextM, imperial)}, ${lowerFirst(p.next.instruction)}`);
         }
       }
       if (p.next) {
@@ -128,7 +128,7 @@ export function createTracker(route, { offRouteM = 45, offRouteFixes = 3 } = {})
         for (const mark of [800, 200]) {
           if (stepStartToNext > mark * 1.25 && p.toNextM <= mark && !spoken.has(mark)) {
             spoken.add(mark);
-            announce.push(`In ${speakDist(p.toNextM)}, ${lowerFirst(p.next.instruction)}`);
+            announce.push(`In ${speakDist(p.toNextM, imperial)}, ${lowerFirst(p.next.instruction)}`);
           }
         }
         if (stepStartToNext > 80 && p.toNextM <= 40 && !spoken.has("now")) {
@@ -146,7 +146,19 @@ export function createTracker(route, { offRouteM = 45, offRouteFixes = 3 } = {})
   };
 }
 
-export function speakDist(m) {
+export function speakDist(m, imperial = false) {
+  if (imperial) {
+    const mi = m / 1609.344;
+    if (mi >= 0.2) {
+      if (mi < 0.35) return "a quarter mile";
+      if (mi < 0.65) return "half a mile";
+      if (mi < 0.9) return "three quarters of a mile";
+      const r = mi >= 10 ? Math.round(mi) : Math.round(mi * 10) / 10;
+      return `${r} ${r === 1 ? "mile" : "miles"}`;
+    }
+    const ft = m * 3.28084;
+    return `${Math.max(50, Math.round(ft / 100) * 100 || 50)} feet`;
+  }
   if (m >= 1000) return `${(m / 1000).toFixed(m >= 10000 ? 0 : 1)} kilometers`;
   if (m >= 100) return `${Math.round(m / 50) * 50} meters`;
   return `${Math.max(10, Math.round(m / 10) * 10)} meters`;

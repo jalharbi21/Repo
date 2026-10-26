@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { generateKeyPairSync, verify } from "node:crypto";
-import { decodePolyline, fetchGoogleRoutes, fetchAppleRoutes, parseLatLng, demoRoutes, maneuverFrom, streetFrom } from "../public/providers.js";
+import { decodePolyline, fetchGoogleRoutes, fetchAppleRoutes, parseLatLng, demoRoutes, mergeRoutes, maneuverFrom, streetFrom } from "../public/providers.js";
 import { createTracker, pointAt, prepareRoute, snapToRoute } from "../public/nav.js";
 import { server, signAppleToken } from "../server.js";
 
@@ -99,8 +99,8 @@ test("Google step polylines give each step its start point on the route", async 
   assert.equal(r.trafficDelaySec, 120);
 });
 
-test("navigation follows a drive from start to arrival", () => {
-  const route = demoRoutes().google.routes[0];
+test("navigation follows a drive from start to arrival", async () => {
+  const route = (await demoRoutes()).google.routes[1]; // Queensboro Bridge route
   const t = createTracker(route);
   const said = [];
   let last;
@@ -112,35 +112,96 @@ test("navigation follows a drive from start to arrival", () => {
   said.push(...last.announce);
   assert.ok(last.arrived);
   assert.equal(last.remainingM < 25, true);
-  assert.match(said[0], /^Head southwest on The Embarcadero\. Then, in \d+ meters, turn right onto Market St/);
-  assert.ok(said.some((x) => /^In \d+ meters, turn left into Golden Gate Park/.test(x)));
+  assert.match(said[0], /^Head southwest on 7th Avenue\. Then, in \d+ meters, turn right onto West 45th Street/);
+  assert.ok(said.some((x) => /^In \d+ meters, turn left onto Park Avenue/.test(x)));
   assert.equal(said.at(-1), "You have arrived at your destination");
-  // Each step's own instruction is said once, not repeated when the step begins.
-  assert.equal(said.filter((x) => x === "Turn left into Golden Gate Park").length, 1);
+  // A turn is announced as it happens, and not again when its step begins.
+  assert.equal(said.filter((x) => x.startsWith("Turn left onto Park Avenue")).length, 1);
 });
 
-test("navigation reports the next turn and distance to it", () => {
-  const route = demoRoutes().google.routes[0];
+test("navigation reports the next turn and distance to it", async () => {
+  const route = (await demoRoutes()).google.routes[0];
   const nav = prepareRoute(route);
   const t = createTracker(route);
   const mid = (nav.steps[1].startDist + nav.steps[2].startDist) / 2;
   const u = t.update(pointAt(nav, mid).point);
-  assert.equal(u.current.street, "Market St");
-  assert.equal(u.next.instruction, "Continue onto Fell St");
+  assert.equal(u.current.street, "West 36th Street");
+  assert.equal(u.next.instruction, "Take the ramp toward Queens-Midtown Tunnel");
   assert.ok(Math.abs(u.toNextM - (nav.steps[2].startDist - mid)) < 5);
   assert.ok(u.remainingSec > 0 && u.remainingSec < route.durationSec);
 });
 
-test("navigation notices when you leave the route", () => {
-  const route = demoRoutes().apple.routes[0];
+test("navigation notices when you leave the route", async () => {
+  const route = (await demoRoutes()).google.routes[0];
   const t = createTracker(route);
   t.update(route.path[0]);
-  const away = [route.path[2][0] + 0.01, route.path[2][1]]; // about 1 km north of the line
+  const away = [route.path[20][0] + 0.01, route.path[20][1]]; // about 1 km north of the line
   assert.ok(snapToRoute(t.nav, away).offBy > 500);
   t.update(away);
   t.update(away);
   assert.equal(t.update(away).needsReroute, true);
-  assert.equal(t.update(route.path[3]).needsReroute, false);
+  assert.equal(t.update(route.path[22]).needsReroute, false);
+});
+
+test("Google: sends avoid options and reads toll prices", async () => {
+  let body;
+  const fetchImpl = async (url, opts) => {
+    body = JSON.parse(opts.body);
+    assert.match(opts.headers["X-Goog-FieldMask"], /routes\.travelAdvisory\.tollInfo/);
+    return json({ routes: [
+      { duration: "900s", distanceMeters: 9000, polyline: { encodedPolyline: "_p~iF~ps|U_ulLnnqC" }, legs: [],
+        travelAdvisory: { tollInfo: { estimatedPrice: [{ currencyCode: "USD", units: "6", nanos: 940000000 }, { currencyCode: "USD", units: "1" }] } } },
+      { duration: "1200s", distanceMeters: 9500, polyline: { encodedPolyline: "_p~iF~ps|U_ulLnnqC" }, legs: [] },
+    ] })();
+  };
+  const r = await fetchGoogleRoutes({ apiKey: "k", origin: "A", destination: "B", avoidTolls: true, avoidHighways: true, fetchImpl });
+  assert.deepEqual(body.routeModifiers, { avoidTolls: true, avoidHighways: true });
+  assert.deepEqual(body.extraComputations, ["TOLLS"]);
+  assert.deepEqual(r.routes[0].toll, { amount: 7.94, currency: "USD" });
+  assert.equal(r.routes[0].hasTolls, true);
+  assert.equal(r.routes[1].hasTolls, false);
+});
+
+test("Apple: asks to avoid tolls when the switch is on", async () => {
+  let url;
+  const fetchImpl = async (u) => {
+    url = String(u);
+    return json({ routes: [{ distanceMeters: 1, durationSeconds: 1, hasTolls: true, stepIndexes: [] }], steps: [], stepPaths: [] })();
+  };
+  const r = await fetchAppleRoutes({ accessToken: "t", origin: "A", destination: "B", avoidTolls: true, fetchImpl });
+  assert.match(url, /avoid=Tolls/);
+  assert.equal(r.routes[0].hasTolls, true);
+});
+
+const line = (lat0, n = 30, lngShift = 0) => Array.from({ length: n }, (_, i) => [lat0 + i * 0.001, -73.9 + lngShift]);
+const R = (provider, minutes, extra = {}) => ({ name: provider + minutes, durationSec: minutes * 60, distanceM: 3200, path: line(40.7), steps: [], hasTolls: false, toll: null, ...extra });
+
+test("merge picks the fastest route across both services", () => {
+  const google = { ok: true, routes: [R("g", 20), R("g", 25, { path: line(40.7, 30, 0.05), distanceM: 4000 })] };
+  const apple = { ok: true, routes: [R("a", 18, { path: line(40.7, 30, 0.1), distanceM: 5000 })] };
+  const { routes } = mergeRoutes({ google, apple });
+  assert.deepEqual(routes.map((r) => r.name), ["a18", "g20", "g25"]);
+});
+
+test("merge folds the same road from both services into one entry", () => {
+  const google = { ok: true, routes: [R("g", 20, { hasTolls: true, toll: { amount: 5, currency: "USD" } })] };
+  const apple = { ok: true, routes: [R("a", 19, { hasTolls: true })] };
+  const { routes } = mergeRoutes({ google, apple });
+  assert.equal(routes.length, 1);
+  assert.equal(routes[0].name, "a19");
+  assert.deepEqual(routes[0].sources, ["apple", "google"]);
+  assert.equal(routes[0].toll.amount, 5); // Apple doesn't price tolls; Google's price is borrowed
+});
+
+test("merge honors avoid tolls and avoid highways", () => {
+  const google = { ok: true, routes: [R("g", 20, { hasTolls: true }), R("g", 30, { path: line(40.7, 30, 0.05), distanceM: 4000 })] };
+  const apple = { ok: true, routes: [R("a", 15, { path: line(40.7, 30, 0.1), distanceM: 5000 })] };
+  assert.deepEqual(mergeRoutes({ google, apple }, { avoidTolls: true }).routes.map((r) => r.name), ["a15", "g30"]);
+  // Apple can't avoid highways, so only Google's answer is used.
+  assert.deepEqual(mergeRoutes({ google, apple }, { avoidHighways: true }).routes.map((r) => r.name), ["g20", "g30"]);
+  const onlyTolls = mergeRoutes({ google: { ok: true, routes: [R("g", 20, { hasTolls: true })] } }, { avoidTolls: true });
+  assert.equal(onlyTolls.routes.length, 1);
+  assert.match(onlyTolls.notes[0], /No toll-free route/);
 });
 
 test("signs a valid ES256 token for Apple", () => {
@@ -165,8 +226,10 @@ test("server serves the page, config, demo and explains missing keys", async () 
     assert.equal((await fetch(base + "/../server.js")).status, 404);
     const cfg = await (await fetch(base + "/api/config")).json();
     assert.equal(typeof cfg.google, "boolean");
-    const demo = await (await fetch(base + "/api/routes", { method: "POST", body: JSON.stringify({ demo: true }) })).json();
-    assert.equal(demo.google.routes.length, demoRoutes().google.routes.length);
+    const demo = await (await fetch(base + "/api/routes", { method: "POST", body: JSON.stringify({ demo: true, avoidTolls: true }) })).json();
+    assert.ok(demo.routes.length >= 1);
+    assert.ok(demo.routes.every((r) => !r.hasTolls));
+    assert.equal((await fetch(base + "/demo-basemap.json")).headers.get("content-type"), "application/json; charset=utf-8");
     const live = await (await fetch(base + "/api/routes", { method: "POST", body: JSON.stringify({ origin: "A", destination: "B" }) })).json();
     if (!cfg.google) assert.match(live.google.error, /GOOGLE_MAPS_API_KEY/);
     if (!cfg.apple) assert.match(live.apple.error, /Apple/);
