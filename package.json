@@ -1,0 +1,19 @@
+{
+  "name": "dual-maps-navigation",
+  "version": "1.0.0",
+  "description": "Turn-by-turn navigation that checks Google Maps and Apple Maps and drives the fastest route.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "build": "node scripts/build.mjs",
+    "start:prod": "node dist/server.js",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
+}
