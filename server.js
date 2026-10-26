@@ -8,7 +8,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { createPrivateKey, sign } from "node:crypto";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchGoogleRoutes, fetchAppleRoutes, getAppleAccessToken, demoRoutes, mergeRoutes } from "./public/providers.js";
+import { fetchGoogleRoutes, fetchAppleRoutes, getAppleAccessToken, demoRoutes, demoPlaceRoutes, mergeRoutes } from "./public/providers.js";
+import { fetchGooglePlaces, fetchApplePlaces, fetchGoogleSuggest, fetchAppleSuggest, fetchAppleReverse, mergePlaces, mergeSuggestions, loadDemoPlaces, searchDemoPlaces } from "./public/places.js";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC = join(ROOT, "public");
@@ -76,23 +77,67 @@ async function settle(promise) {
 
 // Asks both services, then returns one list with the fastest route first.
 async function handleRoutes(body) {
-  const { origin, destination, mode = "drive", demo } = body || {};
+  const { origin, destination, mode = "drive", demo, placeId, departAt = null } = body || {};
   const opts = { avoidTolls: Boolean(body?.avoidTolls), avoidHighways: Boolean(body?.avoidHighways) };
   if (demo) {
-    const d = await demoRoutes(opts);
+    const d = placeId ? await demoPlaceRoutes(placeId, { mode, ...opts }) : await demoRoutes(opts);
+    if (!d) return { status: 404, error: "No sample route to that place" };
     return { ...d, ...mergeRoutes(d, opts) };
   }
   if (!origin || !destination) return { status: 400, error: "Enter both a start and a destination" };
   const cfg = config();
   const [google, apple] = await Promise.all([
     cfg.google
-      ? settle(fetchGoogleRoutes({ apiKey: GOOGLE_KEY, origin, destination, mode, ...opts }))
+      ? settle(fetchGoogleRoutes({ apiKey: GOOGLE_KEY, origin, destination, mode, departAt, ...opts }))
       : { ok: false, error: "Google Maps isn't set up on the server (GOOGLE_MAPS_API_KEY)" },
     cfg.apple
-      ? settle(appleAccessToken().then((accessToken) => fetchAppleRoutes({ accessToken, origin, destination, mode, ...opts })))
+      ? settle(appleAccessToken().then((accessToken) => fetchAppleRoutes({ accessToken, origin, destination, mode, departAt, ...opts })))
       : { ok: false, error: "Apple Maps isn't set up on the server (see README)" },
   ]);
   return { origin, destination, mode, ...opts, google, apple, ...mergeRoutes({ google, apple }, opts) };
+}
+
+// Place search: asks both services and returns one list. kind is "search" (places) or "suggest" (autocomplete).
+async function handlePlaces(body) {
+  const { query = "", near = null, kind = "search", category = null, demo } = body || {};
+  const at = Array.isArray(near) && near.length === 2 ? near.map(Number) : null;
+  if (demo) {
+    const places = searchDemoPlaces(await loadDemoPlaces(), { query, category, near: at });
+    return kind === "suggest" ? { suggestions: places.slice(0, 6).map((p) => ({ text: p.name, sub: p.address })) } : { places, demo: true };
+  }
+  if (!String(query).trim()) return { status: 400, error: "Type something to search for" };
+  const cfg = config();
+  const missing = (name) => ({ ok: false, error: `${name} isn't set up on the server` });
+  if (kind === "suggest") {
+    const [google, apple] = await Promise.all([
+      cfg.google ? settle(fetchGoogleSuggest({ apiKey: GOOGLE_KEY, query, near: at })) : missing("Google Maps"),
+      cfg.apple ? settle(appleAccessToken().then((accessToken) => fetchAppleSuggest({ accessToken, query, near: at }))) : missing("Apple Maps"),
+    ]);
+    return { suggestions: mergeSuggestions({ google, apple }) };
+  }
+  const [google, apple] = await Promise.all([
+    cfg.google ? settle(fetchGooglePlaces({ apiKey: GOOGLE_KEY, query, near: at })) : missing("Google Maps"),
+    cfg.apple ? settle(appleAccessToken().then((accessToken) => fetchApplePlaces({ accessToken, query, near: at }))) : missing("Apple Maps"),
+  ]);
+  return { places: mergePlaces({ google, apple }, at), google: { ok: google.ok, error: google.error }, apple: { ok: apple.ok, error: apple.error } };
+}
+
+async function handleReverse(at) {
+  if (!config().apple) return { address: "" };
+  try {
+    return { address: await fetchAppleReverse({ accessToken: await appleAccessToken(), at }) };
+  } catch (err) {
+    return { address: "", error: err.message };
+  }
+}
+
+async function readJson(req) {
+  let raw = "";
+  for await (const chunk of req) {
+    raw += chunk;
+    if (raw.length > 10_000) throw Object.assign(new Error("Request too large"), { status: 413 });
+  }
+  return JSON.parse(raw || "{}");
 }
 
 const TYPES = { ".json": "application/json; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml" };
@@ -107,13 +152,17 @@ export const server = createServer(async (req, res) => {
   try {
     if (url.pathname === "/api/config") return send(res, 200, config());
     if (url.pathname === "/api/routes" && req.method === "POST") {
-      let raw = "";
-      for await (const chunk of req) {
-        raw += chunk;
-        if (raw.length > 10_000) return send(res, 413, { error: "Request too large" });
-      }
-      const result = await handleRoutes(JSON.parse(raw || "{}"));
+      const result = await handleRoutes(await readJson(req));
       return send(res, result.status || 200, result);
+    }
+    if (url.pathname === "/api/places" && req.method === "POST") {
+      const result = await handlePlaces(await readJson(req));
+      return send(res, result.status || 200, result);
+    }
+    if (url.pathname === "/api/reverse") {
+      const at = (url.searchParams.get("at") || "").split(",").map(Number);
+      if (at.length !== 2 || at.some((n) => !Number.isFinite(n))) return send(res, 400, { error: "Use ?at=lat,lng" });
+      return send(res, 200, await handleReverse(at));
     }
     const rel = normalize(url.pathname === "/" ? "/index.html" : url.pathname).replace(/^(\.\.[/\\])+/, "");
     const file = join(PUBLIC, rel);
@@ -126,6 +175,8 @@ export const server = createServer(async (req, res) => {
     return send(res, 200, data, TYPES[extname(file)] || "application/octet-stream");
   } catch (err) {
     if (err.code === "ENOENT") return send(res, 404, "Not found", "text/plain");
+    if (err.status) return send(res, err.status, { error: err.message });
+    if (err instanceof SyntaxError) return send(res, 400, { error: "Bad JSON" });
     return send(res, 500, { error: err.message });
   }
 });

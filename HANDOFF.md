@@ -3,36 +3,54 @@
 Read this first when picking up work on this repo.
 
 ## What it is
-A web navigation app that uses **Google Maps** and **Apple Maps** only as data sources. For each trip it asks both, merges the answers, and drives the **fastest route** with its own turn-by-turn navigation. It never opens the Google or Apple apps.
+A web maps and navigation app that uses **Google Maps** and **Apple Maps** only as data sources. Every place search and every trip asks both, merges the answers, and the app drives the **fastest route** with its own turn-by-turn navigation. It never opens the Google or Apple apps.
 
-Owner: Sajan (GitHub `jalharbi21`). Work so far is on branch `claude/project-thread-9295od`, PR #1.
+Owner: Sajan (GitHub `jalharbi21`).
+- PR #1 (merged): routing, tolls, avoid switches, navigation.
+- Branch `claude/project-thread-eiwmmr`: homepage and the Google/Apple-style sections listed below.
 
 ## What's built
-- **One route panel** over a full-screen map. It shows the fastest route first, then the alternatives ranked by time. When Google and Apple suggest the same road, it's shown once.
-- **Tolls:** each route shows its price from Google (`extraComputations: TOLLS`), or "No tolls". Apple only reports has-tolls, so an Apple route on the same road as a Google route borrows Google's price.
-- **Avoid tolls / Avoid highways switches:** sent as Google `routeModifiers` and Apple `avoid=Tolls`. Apple can't avoid highways, so with that switch on only Google's routes are used.
-- **Navigation screen:**
-  - turn banner with the next and the following maneuver
-  - a map that follows your position
-  - time and distance left, arrival time, current street and toll
-  - spoken directions (miles and feet for US English)
-  - off-route detection with re-routing
-  - live GPS or a simulated drive (1×, 4×, 10×)
-- **Map:** OpenStreetMap raster tiles. Where tiles can't load (claude.ai blocks outside images), it falls back to a built-in vector map of the sample area.
-- **Sample trip:** Times Square → JFK on real streets. Its three routes are a toll tunnel (fastest), a toll-free bridge route, and a no-highway route. The times and the $6.94 toll are examples, not live data.
-- **Try-it page:** https://claude.ai/artifact/WxkB5dPH5LPUFx6Z3YwC7s. It is published from `public/` and shows the sample trip only, because claude.ai pages can't call outside APIs.
+
+**Home screen** (Explore tab)
+- Search bar, category chips (restaurants, coffee, gas, EV charging, parking, groceries, pharmacy, hotels).
+- Home / Work / Favorites / Lists shortcuts, with ETAs from your location.
+- A time-aware card: Work on weekday mornings, Home later in the day (`suggestedShortcut` in `library.js`).
+- Recent searches and places, and "Explore nearby" (open now, closest first; in live mode it points you to the chips to save API calls).
+
+**Search**: suggestions as you type (both services' autocomplete, merged), plus saved places, recents and categories. Results are pins on the map. `lat,lng` jumps to a point; right-click or long-press drops a pin (reverse geocoded by Apple when live).
+
+**Place page**: category, distance, open-now and weekly hours, Google rating/price, address, phone, website, coordinates, and a badge for which service knows the place. Actions: Directions, Start, Save (to any list), Share, Call, Website, Set as Home/Work.
+
+**Saved tab**: Home, Work, Favorites, Want to go, custom lists (create, rename, delete, remove places, show all on map). Stored in `localStorage` only.
+
+**Directions**: from your location (or typed text), drive/walk/bike, avoid tolls/highways, *Leave now / Leave at / Arrive by*. "Leave at" is sent to Google (`departureTime`) and Apple (`departureDate`). "Arrive by" is worked out in the app (leave-by = arrive-by minus the route time, using current traffic), because Google's Routes API only takes arrival times for transit.
+
+**The original twist**
+- **Second opinion:** each fastest route says whether Google and Apple agreed, or which one found it and by how much.
+- **Trip ledger (Trips tab):** each finished trip (arrived, or ended past halfway) records the winner and the time saved vs. the other service's best route. The tab shows this month's time saved, trips, distance, time on the road, tolls paid, toll-free-by-choice trips, a Google / both / Apple scoreboard, and a trip list. Logic: `monthStats` in `library.js`.
+
+**Navigation** (from PR #1) plus: Share ETA (Web Share or clipboard) and Report (crash, hazard, police, slowdown). Reports are kept on this device for an hour and drawn on the map; there's no backend to share them with other users.
+
+**Settings tab**: units (auto/mi/km), theme (auto/light/dark), spoken directions, default avoid tolls/highways, keep history, clear recents/trips, reset everything, keys.
+
+**Sample mode** (no keys, and always on claude.ai): you're at Times Square with 30 New York places. Each has real OSM street routes from Times Square by car (up to 3 alternatives, including toll-free and no-highway ones where they exist), on foot and by bike. Apple's sample times are Google's ±6–10% so the merge has something to compare. The sample JFK trip from PR #1 is still the drive route to JFK. Walking/cycling to JFK isn't included.
+
+**Try-it page:** https://claude.ai/artifact/WxkB5dPH5LPUFx6Z3YwC7s, published from `public/` (sample mode only, because claude.ai pages can't call outside APIs).
 
 ## Files
 | Path | What it does |
 |---|---|
-| `server.js` | Node server with no runtime dependencies. `POST /api/routes` asks both services and merges the results; `GET /api/config` reports which keys are set. It serves `public/`. |
-| `public/providers.js` | Google Routes API and Apple Maps Server API clients, `mergeRoutes`, and the sample-trip data source. Shared by the server and the page. |
-| `public/nav.js` | Navigation engine (pure functions): snap to route, progress, voice prompts, off-route detection. |
-| `public/app.js` | Page logic: search, result panel, map, navigation screen. |
-| `public/index.html` | Markup and CSS, with Leaflet's CSS inlined. It has no `<html>`/`<head>`; the server wraps it, and the claude.ai publisher adds its own wrapper. |
-| `public/demo-trip.js`, `public/demo-basemap.json` | Sample trip and built-in vector map. They were generated from OSRM routes and OpenFreeMap (OpenMapTiles) vector tiles; the generator scripts were not kept. |
+| `server.js` | Node server, no runtime dependencies. `POST /api/routes` (routes, both services), `POST /api/places` (`kind: "search"` or `"suggest"`), `GET /api/reverse?at=lat,lng`, `GET /api/config`. Serves `public/`. |
+| `public/providers.js` | Google Routes and Apple directions clients, `mergeRoutes`, sample routes (`demoRoutes` for JFK, `demoPlaceRoutes` for the other places). |
+| `public/places.js` | Google Places (New) text search + autocomplete, Apple search + autocomplete + reverse geocode, `mergePlaces`, categories, opening hours (`openStatus`, `hoursTable`), sample place search. |
+| `public/library.js` | On-device user data: Home/Work, lists, recents, trip ledger, reports, settings. Pure logic over a storage object. |
+| `public/nav.js` | Navigation engine (unchanged): snapping, progress, voice prompts, off-route. |
+| `public/app.js` | Page logic: views (home, search, place, directions, saved, trips, settings), map, navigation screen. |
+| `public/index.html` | Markup and CSS (no `<html>`/`<head>`; the server or the claude.ai publisher wraps it). |
+| `public/demo-places.js` | Sample places and routes. Generated by `scripts/make-demo-places.mjs` (needs internet; `--retag` re-reads tolls/highways without refetching). |
+| `public/demo-trip.js`, `public/demo-basemap.json` | Sample JFK trip and the built-in vector map (generator scripts for these were not kept). |
 | `scripts/build.mjs` | Production build into `dist/` (esbuild bundle + minify). |
-| `test/app.test.js` | `node --test` suite (17 tests). |
+| `test/app.test.js`, `test/places.test.js` | `node --test` suites (30 tests). |
 
 ## Run it
 ```bash
@@ -41,16 +59,19 @@ npm start                 # dev: http://localhost:3000
 npm test
 npm install && npm run build && npm run start:prod   # compiled build in dist/
 ```
-`dist/` is committed. To update it after changing source, run `npm run build`.
+`dist/` is committed. Run `npm run build` after changing source.
 
 ## Key setup
-- **Google:** a Cloud API key with the **Routes API** enabled, set as `GOOGLE_MAPS_API_KEY`.
-- **Apple** (needs a paid developer account): a Maps ID plus a key with MapKit/Maps enabled. Either set `APPLE_TEAM_ID`, `APPLE_MAPS_KEY_ID` and `APPLE_MAPS_PRIVATE_KEY_PATH`, and the server signs ES256 tokens itself, or paste a token into `APPLE_MAPS_TOKEN`.
+- **Google:** a Cloud API key with **Routes API** and **Places API (New)** enabled, as `GOOGLE_MAPS_API_KEY`.
+- **Apple** (paid developer account): a Maps ID plus a key with MapKit/Maps enabled. Set `APPLE_TEAM_ID`, `APPLE_MAPS_KEY_ID`, `APPLE_MAPS_PRIVATE_KEY_PATH` (server signs ES256 tokens), or paste a token into `APPLE_MAPS_TOKEN`.
 - Live GPS only works on `localhost` or HTTPS.
 
+## API usage notes
+To keep Google/Apple bills down in live mode: autocomplete waits 300 ms after typing; Home/Work ETAs on the home screen only fetch the one the time-aware card suggests (others say "Tap for ETA"); the place page doesn't fetch an ETA until you tap Directions; ETAs are cached 5 minutes.
+
 ## Not done / next steps
-- **Never tested against the live Google/Apple APIs or real GPS**, because no keys or device were available. Expect small field-mapping fixes on the first live run, especially Apple's `avoid` and cycling support and Google's toll fields.
-- Apple has no toll prices or highway avoidance, so those rely on Google.
-- No address autocomplete or geocoding UI. Both APIs take free-text addresses or `lat,lng`.
-- No hosting or HTTPS setup yet, which a phone needs for GPS.
-- The voice uses the browser's speech engine, and the strings are English only.
+- **Never tested against the live Google/Apple APIs or real GPS** (no keys or device available). Expect small field-mapping fixes on the first live run: Apple `avoid`, cycling, `departureDate`; Google toll fields and Places field mask.
+- No multi-stop trips (Google supports intermediates; Apple's directions API doesn't, so the merge would need a rule for that).
+- No transit directions, offline maps, live traffic layer, lane guidance or speed limits (the two APIs don't return the last three for this use).
+- Reports and saved places are on-device only; sharing them or syncing across devices needs a backend and accounts.
+- No hosting/HTTPS yet, which a phone needs for GPS. English only.

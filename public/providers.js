@@ -49,7 +49,7 @@ async function readError(res, label) {
 }
 
 // Google Routes API: https://developers.google.com/maps/documentation/routes
-export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "drive", avoidTolls = false, avoidHighways = false, fetchImpl = fetch }) {
+export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "drive", avoidTolls = false, avoidHighways = false, departAt = null, fetchImpl = fetch }) {
   if (!apiKey) throw new Error("No Google API key set");
   const travelMode = GOOGLE_MODES[mode] || "DRIVE";
   const body = {
@@ -65,6 +65,8 @@ export async function fetchGoogleRoutes({ apiKey, origin, destination, mode = "d
     body.extraComputations = ["TOLLS"];
     body.routeModifiers = { avoidTolls, avoidHighways };
   }
+  // A future departure time gets Google's predicted traffic for that time.
+  if (departAt && new Date(departAt) > Date.now() + 60_000 && travelMode !== "WALK") body.departureTime = new Date(departAt).toISOString();
   const res = await fetchImpl("https://routes.googleapis.com/directions/v2:computeRoutes", {
     method: "POST",
     headers: {
@@ -192,7 +194,7 @@ export async function getAppleAccessToken({ authToken, fetchImpl = fetch }) {
   return data.accessToken;
 }
 
-export async function fetchAppleRoutes({ authToken, accessToken, origin, destination, mode = "drive", avoidTolls = false, fetchImpl = fetch }) {
+export async function fetchAppleRoutes({ authToken, accessToken, origin, destination, mode = "drive", avoidTolls = false, departAt = null, fetchImpl = fetch }) {
   const token = accessToken || (await getAppleAccessToken({ authToken, fetchImpl }));
   const params = new URLSearchParams({
     origin: origin.trim(),
@@ -202,6 +204,7 @@ export async function fetchAppleRoutes({ authToken, accessToken, origin, destina
     lang: "en-US",
   });
   if (avoidTolls) params.set("avoid", "Tolls"); // Apple can avoid tolls, but has no option to avoid highways
+  if (departAt && new Date(departAt) > Date.now() + 60_000) params.set("departureDate", new Date(departAt).toISOString());
   const res = await fetchImpl(`https://maps-api.apple.com/v1/directions?${params}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -308,12 +311,16 @@ export function mergeRoutes(results, { avoidTolls = false, avoidHighways = false
   return { routes: kept, notes };
 }
 
-// ---- Sample trip, so the app can be tried before any keys are set
+// ---- Sample routes, so the app can be tried before any keys are set
 
-let demoCache = null;
+let demoCache = null, placesCache = null;
 async function loadDemoTrip() {
   if (!demoCache) demoCache = (await import("./demo-trip.js")).DEMO_TRIP;
   return demoCache;
+}
+async function loadDemoPlaces() {
+  if (!placesCache) placesCache = (await import("./demo-places.js")).DEMO_PLACES;
+  return placesCache;
 }
 
 function demoRoute(base, name, extra) {
@@ -329,7 +336,51 @@ function demoRoute(base, name, extra) {
   };
 }
 
-// Mimics what each service returns for the sample trip, honoring the same avoid options they do.
+function decodeDeltas(arr) {
+  const out = [];
+  let a = 0, b = 0;
+  for (let i = 0; i < arr.length; i += 2) {
+    a += arr[i]; b += arr[i + 1];
+    out.push([a / 1e5, b / 1e5]);
+  }
+  return out;
+}
+
+// Small, fixed differences between the two services' times, so the sample shows them disagreeing.
+function wobble(id, k) {
+  let h = 7;
+  for (const c of id + k) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return ((h % 1000) / 1000) * 0.16 - 0.06; // between -6% and +10%
+}
+
+// Routes from the sample location to one of the sample places, shaped like each service's answer.
+export async function demoPlaceRoutes(placeId, { mode = "drive", avoidTolls = false, avoidHighways = false } = {}) {
+  if (placeId === "jfk" && mode === "drive") return demoRoutes({ avoidTolls, avoidHighways });
+  const cat = await loadDemoPlaces();
+  const place = cat.places.find((p) => p.id === placeId);
+  const raw = cat.routes[placeId]?.[mode];
+  if (!place || !raw?.length) return null;
+  const base = raw.map((r) => demoRoute(
+    { durationSec: r.d, distanceM: r.m, path: decodeDeltas(r.path), steps: r.steps.map(([instruction, distanceM, durationSec, startIdx]) => ({ instruction, distanceM, durationSec, startIdx })) },
+    r.via ? `via ${r.via}` : "Direct route",
+    { hasTolls: mode === "drive" && r.tolls, toll: mode === "drive" && r.tolls ? { amount: 6.94, currency: "USD" } : null, highway: r.highway }
+  ));
+  let google = base;
+  if (avoidHighways) google = google.filter((r) => !r.highway).length ? google.filter((r) => !r.highway) : google;
+  if (avoidTolls) google = google.filter((r) => !r.hasTolls).length ? google.filter((r) => !r.hasTolls) : google;
+  const apple = (avoidTolls ? base.filter((r) => !r.hasTolls) : base).slice(0, 2).map((r, i) => ({
+    ...r, durationSec: Math.round(r.durationSec * (1 + wobble(placeId, mode + i))), toll: null,
+  }));
+  return {
+    demo: true,
+    origin: cat.origin.name,
+    destination: place.name,
+    google: { ok: true, provider: "google", routes: google },
+    apple: { ok: true, provider: "apple", routes: apple },
+  };
+}
+
+// Mimics what each service returns for the sample trip to JFK, honoring the same avoid options they do.
 export async function demoRoutes({ avoidTolls = false, avoidHighways = false } = {}) {
   const t = await loadDemoTrip();
   const fast = demoRoute(t.routes.fast, "via Queens-Midtown Tunnel and Van Wyck Expy", { hasTolls: true, toll: { amount: 6.94, currency: "USD" } });
