@@ -1,4 +1,5 @@
 <title>Two-Map Navigator</title>
+<meta name="description" content="Search, save and navigate with Google Maps and Apple Maps checked side by side.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800&family=Overpass+Mono:wght@500&display=swap">
 <style>
@@ -10,6 +11,8 @@
    While navigating, the panel gives way to a turn banner on top and a trip bar at the bottom. */
 :root {
   --bg: #eef1f4;
+  --pin: #e2513d;
+  --apple: #8a63d2;
   --panel: #ffffff;
   --ink: #141a23;
   --muted: #5f6b7a;
@@ -42,7 +45,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0f1318; --panel: #171c23; --ink: #e9edf2; --muted: #9aa5b3; --line: #262e38; --soft: #1e252e;
-    --accent: #6e8ff7; --accent-ink: #0b1020; --accent-soft: #1d2747; --toll: #f0b257; --toll-soft: #3a2a12;
+    --accent: #6e8ff7; --accent-ink: #0b1020; --pin: #f0705d; --apple: #b293f0; --accent-soft: #1d2747; --toll: #f0b257; --toll-soft: #3a2a12;
     --ok: #5cc98d; --ok-soft: #153325; --alt-route: #5b6676;
     --land: #1b2026; --water: #0f2a40; --park: #1d3024; --aero: #23242c; --road-minor: #2b323b; --road-mid: #343c46;
     --road-major: #5a4c33; --road-hwy: #8a6236; --road-case: #12161b; --label: #8d97a3;
@@ -52,7 +55,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #0f1318; --panel: #171c23; --ink: #e9edf2; --muted: #9aa5b3; --line: #262e38; --soft: #1e252e;
-  --accent: #6e8ff7; --accent-ink: #0b1020; --accent-soft: #1d2747; --toll: #f0b257; --toll-soft: #3a2a12;
+  --accent: #6e8ff7; --accent-ink: #0b1020; --pin: #f0705d; --apple: #b293f0; --accent-soft: #1d2747; --toll: #f0b257; --toll-soft: #3a2a12;
   --ok: #5cc98d; --ok-soft: #153325; --alt-route: #5b6676;
   --land: #1b2026; --water: #0f2a40; --park: #1d3024; --aero: #23242c; --road-minor: #2b323b; --road-mid: #343c46;
   --road-major: #5a4c33; --road-hwy: #8a6236; --road-case: #12161b; --label: #8d97a3;
@@ -183,13 +186,13 @@ body.navigating .nav-only { display: grid; }
 .turn.off { background: var(--toll); color: #fff; }
 .tripbar {
   position: absolute; z-index: 700; bottom: 16px; left: 50%; transform: translateX(-50%); width: min(560px, calc(100% - 32px));
-  grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; align-items: center;
+  grid-template-columns: minmax(0, 1fr); gap: 10px 14px; align-items: center;
   background: var(--panel); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow);
 }
 .tripbar .big { font: 800 28px/1 var(--display); font-variant-numeric: tabular-nums; color: var(--ok); }
 .tripbar .meta { color: var(--muted); font: 500 13px var(--mono); }
 .tripbar .street { font: 600 14px var(--body); overflow-wrap: anywhere; margin-top: 4px; }
-.navctl { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.navctl { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-start; }
 .navctl button { height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--soft); font: 700 13px var(--body); cursor: pointer; }
 .navctl button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .navctl .end { background: #d64545; border-color: transparent; color: #fff; }
@@ -211,6 +214,130 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
 .dlg .acts { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 .ghost { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 10px 14px; font: 700 14px var(--body); cursor: pointer; }
 
+
+/* ---- home sheet, views and tabs */
+.sheet { width: 400px; }
+.sheet-scroll { gap: 12px; }
+.view { display: grid; gap: 14px; align-content: start; }
+.searchbar { position: relative; display: flex; align-items: center; gap: 6px; background: var(--soft); border-radius: 12px; padding: 4px 6px 4px 10px; }
+.searchbar > svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
+.searchbar input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 400 15px var(--body); padding: 9px 2px; }
+.searchbar input:focus { outline: none; }
+.searchbar:focus-within { box-shadow: 0 0 0 2px var(--accent); }
+.searchbar input::-webkit-search-cancel-button { display: none; }
+.sb-btn { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; cursor: pointer; color: var(--muted); flex: none; }
+.sb-btn svg { width: 18px; height: 18px; }
+.hello h2 { margin: 0; font: 800 22px/1.1 var(--display); }
+.hello p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.chiprow { display: flex; gap: 6px; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 4px; scrollbar-width: none; }
+.chiprow::-webkit-scrollbar { display: none; }
+.chipbtn { flex: none; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 7px 12px 7px 10px; font: 600 13px var(--body); cursor: pointer; }
+.chipbtn svg { width: 16px; height: 16px; color: var(--accent); }
+.shorts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.short { display: grid; justify-items: center; gap: 3px; border: 0; background: var(--soft); border-radius: 12px; padding: 10px 4px; cursor: pointer; text-align: center; min-width: 0; }
+.short-ic { width: 36px; height: 36px; border-radius: 50%; background: var(--panel); display: grid; place-items: center; color: var(--accent); }
+.short-ic svg { width: 19px; height: 19px; }
+.short b { font: 700 13px var(--body); }
+.short-sub { font: 500 11px var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.moment { display: grid; gap: 6px; text-align: left; border: 0; border-radius: 14px; padding: 14px; cursor: pointer; background: linear-gradient(135deg, var(--accent-soft), var(--soft)); }
+.moment-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.moment-row b { font: 800 26px/1 var(--display); color: var(--ok); font-variant-numeric: tabular-nums; }
+.moment-row > span { font-size: 13px; color: var(--muted); }
+.ledger-mini { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 10px; align-items: center; text-align: left; border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 12px; cursor: pointer; }
+.ledger-ic { width: 38px; height: 38px; border-radius: 10px; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; }
+.ledger-ic svg { width: 20px; height: 20px; }
+.ledger-mini b { display: block; font: 700 14px var(--body); }
+.sub { display: block; color: var(--muted); font-size: 13px; }
+.sub.small { font-size: 12px; margin: 0; }
+.block { display: grid; gap: 6px; }
+.block-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.block-h h3, .group h3 { margin: 0; font: 800 15px var(--display); }
+.mini-h { margin: 4px 0 0; font: 700 11px var(--body); letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.tag { font: 700 11px var(--body); color: var(--muted); background: var(--soft); border-radius: 999px; padding: 3px 8px; }
+.link { border: 0; background: none; color: var(--accent); font: 700 13px var(--body); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 4px 0; }
+.link svg { width: 14px; height: 14px; }
+.rows { list-style: none; margin: 0; padding: 0; display: grid; }
+.rows li { border-bottom: 1px solid var(--line); }
+.rows li:last-child { border-bottom: 0; }
+.row { width: 100%; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: center; text-align: left; border: 0; background: none; padding: 10px 2px; cursor: pointer; }
+.row.static { cursor: default; }
+.row > svg { width: 20px; height: 20px; color: var(--muted); }
+.row b { display: block; font: 600 14px var(--body); overflow-wrap: anywhere; }
+.row .sub { font-size: 12.5px; overflow-wrap: anywhere; }
+.row:hover b { color: var(--accent); }
+.row-wrap { display: flex; align-items: center; gap: 4px; }
+.row-wrap .row { flex: 1; min-width: 0; }
+.iconbtn.sm { width: 30px; height: 30px; border: 0; }
+.okc { color: var(--ok); } .badc { color: #d64545; } .warnc { color: var(--toll); }
+.strong { font-weight: 700; margin: 4px 0 0; font-size: 14px; }
+.src2 { display: inline-flex; align-items: center; gap: 4px; font: 700 11px var(--body); color: var(--muted); background: var(--soft); border-radius: 999px; padding: 3px 8px; white-space: nowrap; }
+.src2.both { color: var(--ok); background: var(--ok-soft); }
+.src2 svg { width: 11px; height: 11px; }
+.vhead { display: flex; align-items: center; gap: 8px; }
+.vhead .sp { flex: 1; }
+.vt { margin: 0; font: 800 20px/1.15 var(--display); }
+.ptitle { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: start; }
+.pt-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+.pt-ic svg { width: 22px; height: 22px; }
+.ptitle h2 { margin: 0; font: 800 21px/1.15 var(--display); overflow-wrap: anywhere; }
+.ptitle .sub { margin: 4px 0 0; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.act-main { display: inline-flex; align-items: center; gap: 6px; flex: 1 1 100%; justify-content: center; }
+.act-main svg, .act svg { width: 17px; height: 17px; }
+.act { flex: 1; min-width: 64px; display: grid; justify-items: center; gap: 3px; border: 0; background: var(--soft); border-radius: 10px; padding: 9px 6px; font: 700 12px var(--body); cursor: pointer; color: var(--ink); text-decoration: none; }
+.act[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
+.savebox { display: grid; gap: 8px; background: var(--soft); border-radius: 12px; padding: 12px; }
+.check { display: flex; align-items: center; gap: 8px; font: 600 14px var(--body); cursor: pointer; }
+.check svg { width: 16px; height: 16px; color: var(--muted); }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.info { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.info > li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; overflow-wrap: anywhere; }
+.info > li > svg { width: 18px; height: 18px; color: var(--muted); margin-top: 1px; }
+.info a { color: var(--accent); }
+.info summary { cursor: pointer; font-weight: 600; }
+.hours { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 3px; font: 500 13px var(--mono); color: var(--muted); white-space: pre; }
+.mono { font: 500 13px var(--mono); }
+.setas { display: flex; gap: 8px; flex-wrap: wrap; }
+.ghost.sm { padding: 8px 12px; font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+.ghost.sm svg { width: 16px; height: 16px; }
+.ghost[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.ghost.danger { color: #d64545; }
+.verdict { margin: 0; font: 600 13px var(--body); color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.verdict.both { color: var(--ok); }
+.verdict svg { width: 14px; height: 14px; }
+.dirhead { display: flex; align-items: center; gap: 8px; }
+.dirhead h2 { margin: 0; font: 800 18px var(--display); }
+.whenrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.whenrow select, .whenrow input { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 7px 8px; font: 600 13px var(--body); }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat { background: var(--soft); border-radius: 12px; padding: 12px; display: grid; gap: 4px; }
+.stat b { font: 800 20px/1.1 var(--display); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.stat.hero { grid-column: 1 / -1; background: var(--ok-soft); }
+.stat.hero b { font-size: 34px; color: var(--ok); }
+.split { display: flex; height: 12px; border-radius: 6px; overflow: hidden; gap: 2px; background: var(--soft); }
+.split .g, .legend .g { background: var(--accent); }
+.split .b, .legend .b { background: var(--ok); }
+.split .a, .legend .a { background: var(--apple); }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; }
+.group { display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 12px; }
+.srow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; flex-wrap: wrap; font-size: 14px; }
+.srow b { font-weight: 600; }
+.srow > span:first-child { flex: 1; min-width: 0; }
+.switch.bare { border: 0; padding: 0; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); background: var(--panel); }
+.tabs button { border: 0; background: none; display: grid; justify-items: center; gap: 2px; padding: 8px 4px 9px; font: 700 11px var(--body); color: var(--muted); cursor: pointer; }
+.tabs button svg { width: 20px; height: 20px; }
+.tabs button[aria-current="true"] { color: var(--accent); }
+.locate { position: absolute; z-index: 600; right: 10px; bottom: 96px; }
+.locate button { width: 34px; height: 34px; border-radius: 4px; border: 2px solid rgba(0,0,0,.2); background: var(--panel); color: var(--ink); display: grid; place-items: center; cursor: pointer; background-clip: padding-box; }
+.locate svg { width: 18px; height: 18px; }
+.pin.sel svg { width: 36px; height: 46px; transform: translate(-3px, -8px); }
+.report-pin span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--toll); color: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35); }
+.report-pin svg { width: 16px; height: 16px; }
+.toast { position: absolute; z-index: 900; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: min(440px, calc(100% - 32px)); background: var(--ink); color: var(--panel); border-radius: 12px; padding: 10px 14px; font: 600 13px var(--body); box-shadow: var(--shadow); }
+.report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.report-grid button { border: 1px solid var(--line); background: var(--soft); border-radius: 12px; padding: 14px; font: 700 14px var(--body); cursor: pointer; }
 @media (max-width: 760px) {
   .app { height: auto; min-height: 0; overflow: visible; }
   #map { position: relative; height: 46vh; min-height: 300px; }
@@ -218,6 +345,10 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
   .sheet-scroll { padding: 18px max(16px, env(safe-area-inset-right, 0px)) 18px max(16px, env(safe-area-inset-left, 0px)); overflow: visible; }
   .foot { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   .map-note { left: 12px; right: 12px; top: 12px; max-width: none; }
+  .tabs { position: sticky; bottom: 0; z-index: 5; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .locate { top: calc(46vh - 120px); bottom: auto; }
+  body.navigating .locate { display: none; }
+  .toast { position: fixed; bottom: 80px; }
   body.navigating .app { height: 100%; overflow: hidden; }
   body.navigating #map { position: absolute; height: auto; min-height: 0; }
   .turn { top: 12px; width: calc(100% - 24px); padding: 12px 14px; }
@@ -233,37 +364,68 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
 </style>
 
 <div class="app">
-  <div id="map" role="application" aria-label="Map"></div>
-  <div class="map-note browse-only" id="map-note" hidden></div>
+  <div id="map" role="application" aria-label="Map. Right-click or long-press to drop a pin."></div>
+  <div class="locate browse-only"><button type="button" id="locate" aria-label="Show my location" title="Show my location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg></button></div>
 
-  <aside class="sheet browse-only" aria-label="Route planner">
-    <div class="sheet-scroll">
+  <aside class="sheet browse-only" id="sheet" aria-label="Maps">
+    <div class="sheet-scroll" id="sheet-scroll">
       <div class="brand">
         <h1><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 18-7-4-7 4z"/></svg></span>Two-Map Navigator</h1>
         <button class="iconbtn" type="button" id="open-keys" aria-label="Live data keys" title="Live data keys"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 7l3 3M14 9l2 2"/></svg></button>
       </div>
 
-      <form class="trip" id="trip" autocomplete="on">
-        <div class="stops">
-          <label class="stop" for="origin"><i aria-hidden="true"></i><input type="text" id="origin" name="origin" placeholder="Start: address, place, or lat,lng" aria-label="Start" required></label>
-          <label class="stop" for="destination"><i aria-hidden="true"></i><input type="text" id="destination" name="destination" placeholder="Where to?" aria-label="Destination" required></label>
-          <button class="swap" type="button" id="swap" aria-label="Swap start and destination"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M20 16l-4 4-4-4"/></svg></button>
-        </div>
-        <div class="modes" role="group" aria-label="Travel mode">
-          <button type="button" data-mode="drive" aria-pressed="true">Drive</button>
-          <button type="button" data-mode="walk" aria-pressed="false">Walk</button>
-          <button type="button" data-mode="bike" aria-pressed="false">Bike</button>
-        </div>
-        <div class="switches" role="group" aria-label="Route options">
-          <label class="switch" for="opt-tolls"><input type="checkbox" id="opt-tolls"><span class="track"></span>Avoid tolls</label>
-          <label class="switch" for="opt-highways"><input type="checkbox" id="opt-highways"><span class="track"></span>Avoid highways</label>
-        </div>
-        <button class="go" type="submit" id="go">Find route</button>
+      <form class="searchbar" id="searchbar" role="search">
+        <button type="button" class="sb-btn" id="sb-back" aria-label="Back to home" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14z"/><path d="M21 21l-5-5"/></svg>
+        <input type="search" id="q" placeholder="Search places, addresses or lat,lng" aria-label="Search" autocomplete="off" enterkeyhint="search">
+        <button type="button" class="sb-btn" id="sb-clear" aria-label="Clear search" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </form>
 
-      <div class="divider"></div>
-      <section id="result" aria-live="polite"><p class="empty">Loading the sample trip…</p></section>
+      <section class="view" id="v-home" aria-label="Home"></section>
+      <section class="view" id="v-search" aria-label="Search results" aria-live="polite" hidden></section>
+      <section class="view" id="v-place" aria-label="Place" hidden></section>
+
+      <section class="view" id="v-dir" aria-label="Directions" hidden>
+        <div class="dirhead"><button type="button" class="iconbtn" data-back aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><h2>Directions</h2></div>
+        <form class="trip" id="trip" autocomplete="off">
+          <div class="stops">
+            <label class="stop" for="origin"><i aria-hidden="true"></i><input type="text" id="origin" name="origin" placeholder="Start: your location, address, or lat,lng" aria-label="Start" required></label>
+            <label class="stop" for="destination"><i aria-hidden="true"></i><input type="text" id="destination" name="destination" placeholder="Where to?" aria-label="Destination" required></label>
+            <button class="swap" type="button" id="swap" aria-label="Swap start and destination"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M20 16l-4 4-4-4"/></svg></button>
+          </div>
+          <div class="modes" data-group="mode" role="group" aria-label="Travel mode">
+            <button type="button" data-mode="drive" aria-pressed="true">Drive</button>
+            <button type="button" data-mode="walk" aria-pressed="false">Walk</button>
+            <button type="button" data-mode="bike" aria-pressed="false">Bike</button>
+          </div>
+          <div class="switches" role="group" aria-label="Route options">
+            <label class="switch" for="opt-tolls"><input type="checkbox" id="opt-tolls"><span class="track"></span>Avoid tolls</label>
+            <label class="switch" for="opt-highways"><input type="checkbox" id="opt-highways"><span class="track"></span>Avoid highways</label>
+          </div>
+          <div class="whenrow">
+            <select id="when" aria-label="When">
+              <option value="now">Leave now</option>
+              <option value="depart">Leave at…</option>
+              <option value="arrive">Arrive by…</option>
+            </select>
+            <input type="datetime-local" id="when-at" aria-label="Time" hidden>
+          </div>
+          <button class="go" type="submit" id="go">Find route</button>
+        </form>
+        <div class="divider"></div>
+        <section id="result" aria-live="polite"></section>
+      </section>
+
+      <section class="view" id="v-saved" aria-label="Saved" hidden></section>
+      <section class="view" id="v-trips" aria-label="Trip ledger" hidden></section>
+      <section class="view" id="v-settings" aria-label="Settings" hidden></section>
     </div>
+    <nav class="tabs" aria-label="Sections">
+      <button type="button" data-tab="home" aria-current="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Explore</button>
+      <button type="button" data-tab="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Saved</button>
+      <button type="button" data-tab="trips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7"/><path d="M2 20h20"/></svg>Trips</button>
+      <button type="button" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings</button>
+    </nav>
     <div class="foot">
       <span id="foot-text">Checks Google Maps and Apple Maps, then picks the fastest.</span>
       <span class="src"><span id="src-google">Google</span><span id="src-apple">Apple</span></span>
@@ -287,6 +449,8 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
     <div class="navctl">
       <button type="button" id="nav-steps" aria-pressed="false">Steps</button>
       <button type="button" id="nav-voice" aria-pressed="true">Voice on</button>
+      <button type="button" id="nav-share">Share ETA</button>
+      <button type="button" id="nav-report">Report</button>
       <button type="button" id="nav-pos">Use GPS</button>
       <button type="button" id="nav-speed" hidden>Speed 4×</button>
       <button type="button" class="end" id="nav-end">End</button>
@@ -294,13 +458,14 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
     <ol class="steplist" id="nav-steplist" hidden></ol>
     <div class="source" id="nav-source"></div>
   </section>
+  <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
 <dialog id="keys">
   <form class="dlg" method="dialog" id="keys-form">
-    <h3>Live route data</h3>
+    <h3>Live map data</h3>
     <p id="keys-mode-note"></p>
-    <label for="k-google">Google Maps API key (Routes API enabled)
+    <label for="k-google">Google Maps API key (Routes API and Places API (New) enabled)
       <input type="password" id="k-google" placeholder="AIza…" autocomplete="off">
     </label>
     <label for="k-apple">Apple Maps token (a signed JWT)
@@ -309,9 +474,23 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
     <p>Keys you paste here stay in this browser. How to get them: <a href="https://developers.google.com/maps/documentation/routes/get-api-key" target="_blank" rel="noopener">Google key</a> · <a href="https://developer.apple.com/documentation/applemapsserverapi/creating-a-maps-token" target="_blank" rel="noopener">Apple token</a>.</p>
     <div class="acts">
       <button class="ghost" type="button" id="k-clear">Clear keys</button>
-      <button class="ghost" type="button" id="k-demo">Show sample trip</button>
+      <button class="ghost" type="button" id="k-demo">Use sample data</button>
       <button class="go" type="submit">Save</button>
     </div>
+  </form>
+</dialog>
+
+<dialog id="report">
+  <form class="dlg" method="dialog">
+    <h3>Report on the road</h3>
+    <p>Marks it at your position on your map for the next hour. Reports stay on this device.</p>
+    <div class="report-grid">
+      <button type="button" data-report="crash">Crash</button>
+      <button type="button" data-report="hazard">Hazard</button>
+      <button type="button" data-report="police">Police</button>
+      <button type="button" data-report="slowdown">Slowdown</button>
+    </div>
+    <div class="acts"><button class="ghost" type="submit">Cancel</button></div>
   </form>
 </dialog>
 
