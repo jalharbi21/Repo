@@ -14,8 +14,9 @@ const ROOT = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC = join(ROOT, "public");
 
 // Load .env if present (KEY=value lines).
-const envFile = join(ROOT, ".env");
-if (existsSync(envFile)) {
+// Looks next to this file first, then in the folder it was started from (for dist/server.js).
+const envFile = [join(ROOT, ".env"), join(process.cwd(), ".env")].find((f) => existsSync(f));
+if (envFile) {
   for (const line of readFileSync(envFile, "utf8").split(/\r?\n/)) {
     const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);
     if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
